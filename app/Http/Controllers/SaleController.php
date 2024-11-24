@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sale;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
+use Illuminate\Http\Request;
 
 class SaleController extends Controller
 {
@@ -13,7 +14,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        //
+        return view('sales.index');
     }
 
     /**
@@ -27,7 +28,7 @@ class SaleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSaleRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -51,7 +52,7 @@ class SaleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSaleRequest $request, Sale $sale)
+    public function update(Request $request, Sale $sale)
     {
         //
     }

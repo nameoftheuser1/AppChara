@@ -40,13 +40,4 @@ class Product extends Model
         return $this->hasOne(Inventory::class);
     }
 
-    /**
-     * Get the sizes associated with the product.
-     */
-    public function sizes(): BelongsToMany
-    {
-        return $this->belongsToMany(Size::class, 'product_size')
-            ->withPivot('price')  // Include price in the pivot table
-            ->withTimestamps();
-    }
 }

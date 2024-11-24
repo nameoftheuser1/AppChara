@@ -8,6 +8,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>{{ env('APP_NAME') }}</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
 </head>
 
 <body class="bg-gray-50">
@@ -29,12 +31,13 @@
         aria-label="Sidebar">
         <div class="flex flex-col h-full px-3 py-4 overflow-y-auto bg-gradient-to-b from-yellow-400 to-green-500">
             <div class="flex items-center mb-5 p-2">
-                <span class="text-white text-2xl font-bold mx-auto">AppChara</span>
+                <img src="{{ asset('img/appchara-logo.png') }}" alt="Logo" srcset="">
             </div>
             <ul class="space-y-2 font-medium flex-grow">
                 <li>
-                    <a href="#"
-                        class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group">
+                    <a href="{{ route('dashboard') }}"
+                        class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group
+                        {{ request()->routeIs('dashboard') ? 'bg-white/25 shadow-md' : '' }}">
                         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                             viewBox="0 0 22 21">
                             <path
@@ -48,7 +51,7 @@
                 <li>
                     <a href="{{ route('products.index') }}"
                         class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group
-                        {{ request()->routeIs('products.index', 'products.create', 'products.edit') ? 'bg-white/25 shadow-md' : '' }}">
+                        {{ request()->routeIs('products.index', 'products.create', 'products.edit', 'sizes.index') ? 'bg-white/25 shadow-md' : '' }}">
                         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                             viewBox="0 0 18 20">
                             <path
@@ -58,8 +61,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#"
-                        class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group">
+                    <a href="{{ route('sales.index') }}"
+                        class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group
+                        {{ request()->routeIs('sales.index', 'sales.create', 'sales.edit') ? 'bg-white/25 shadow-md' : '' }}">
                         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Inventory;
 use App\Http\Requests\StoreInventoryRequest;
 use App\Http\Requests\UpdateInventoryRequest;
+use App\Models\Product;
+use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
@@ -27,7 +29,7 @@ class InventoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreInventoryRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -43,19 +45,29 @@ class InventoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Inventory $inventory)
+    public function edit(Product $product)
     {
-        //
+        return view('inventories.edit', [
+            'product' => $product,
+            'inventory' => $product->inventory
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateInventoryRequest $request, Inventory $inventory)
+    public function update(Request $request, Product $product)
     {
-        //
-    }
+        $request->validate([
+            'quantity' => 'required|integer|min:0',
+        ]);
 
+        $inventory = $product->inventory;
+        $inventory->quantity = $request->quantity;
+        $inventory->save();
+
+        return redirect()->route('products.index')->with('success', 'Inventory updated successfully.');
+    }
     /**
      * Remove the specified resource from storage.
      */
