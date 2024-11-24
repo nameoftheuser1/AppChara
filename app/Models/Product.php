@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -19,6 +19,7 @@ class Product extends Model
     protected $fillable = [
         'name',
         'price',
+        'img_path',
     ];
 
     /**
@@ -37,5 +38,15 @@ class Product extends Model
     public function inventory(): HasOne
     {
         return $this->hasOne(Inventory::class);
+    }
+
+    /**
+     * Get the sizes associated with the product.
+     */
+    public function sizes(): BelongsToMany
+    {
+        return $this->belongsToMany(Size::class, 'product_size')
+            ->withPivot('price')  // Include price in the pivot table
+            ->withTimestamps();
     }
 }

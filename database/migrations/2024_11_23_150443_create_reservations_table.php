@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('coupon')->nullable();
             $table->date('pick_up_date');
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
-            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed']);
             $table->timestamps();
         });
     }
