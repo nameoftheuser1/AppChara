@@ -63,7 +63,7 @@
                 <li>
                     <a href="{{ route('sales.index') }}"
                         class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group
-                        {{ request()->routeIs('sales.index', 'sales.create', 'sales.edit') ? 'bg-white/25 shadow-md' : '' }}">
+                        {{ request()->routeIs('sales.index', 'sales.create', 'sales.edit', 'pos.index') ? 'bg-white/25 shadow-md' : '' }}">
                         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path
@@ -117,16 +117,19 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#"
-                            class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group">
-                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 16 16">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3" />
-                            </svg>
-                            <span class="ml-3 font-medium">Logout</span>
-                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="w-full">
+                            @csrf
+                            <button type="submit"
+                                class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group w-full">
+                                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 16 16">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3" />
+                                </svg>
+                                <span class="ml-3 font-medium">Logout</span>
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>

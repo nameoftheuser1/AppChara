@@ -53,21 +53,32 @@ class PosController extends Controller
 
         $product = Product::findOrFail($request->product_id);
 
-        // Check if sufficient stock is available
-        if ($product->inventory->quantity < $request->quantity) {
-            return back()->with('error', 'Insufficient stock');
-        }
-
         // Find or create the current session's cart
         $cart = Cart::firstOrCreate(['session_id' => session()->getId()]);
 
-        // Add the item to the cart
-        $cartItem = CartItem::create([
-            'cart_id' => $cart->id,
-            'product_id' => $product->id,
-            'quantity' => $request->quantity,
-            'price' => $product->price
-        ]);
+        // Check if the product already exists in the cart
+        $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
+
+        $currentCartQuantity = $cartItem ? $cartItem->quantity : 0;
+        $newTotalQuantity = $currentCartQuantity + $request->quantity;
+
+        // Check if sufficient stock is available
+        if ($product->inventory->quantity < $newTotalQuantity) {
+            return back()->with('error', 'Insufficient stock');
+        }
+
+        if ($cartItem) {
+            // Update the quantity if the product is already in the cart
+            $cartItem->update(['quantity' => $newTotalQuantity]);
+        } else {
+            // Add a new cart item if it doesn't exist
+            CartItem::create([
+                'cart_id' => $cart->id,
+                'product_id' => $product->id,
+                'quantity' => $request->quantity,
+                'price' => $product->price
+            ]);
+        }
 
         return back()->with('success', 'Item added to cart');
     }
@@ -113,7 +124,9 @@ class PosController extends Controller
         ]);
 
         $cart_items = CartItem::with('product')
-            ->where('session_id', session()->getId())
+            ->whereHas('cart', function ($query) {
+                $query->where('session_id', session()->getId());
+            })
             ->get();
 
         if ($cart_items->isEmpty()) {
@@ -131,39 +144,80 @@ class PosController extends Controller
             return back()->with('error', 'Insufficient payment amount');
         }
 
-        DB::transaction(function () use ($cart_items, $total, $discount, $request) {
-            // Create the Sale entry
-            $sale = Sale::create([
-                'user_id' => Auth::id(),
-                'total_amount' => $total,
-                'discount' => $discount,
-                'amount_received' => $request->amount_received,
-                'status' => 'completed'  // Sale completed
-            ]);
+        $sale = null; // Declare $sale outside to use it later
 
-            // Create SaleDetails and update inventory
-            foreach ($cart_items as $item) {
-                SaleDetail::create([
-                    'sale_id' => $sale->id,
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'amount' => $item->price * $item->quantity // Store total amount for this product
+        try {
+            DB::transaction(function () use ($cart_items, $total, $discount, $request, &$sale) {
+                // Create the Sale entry
+                $sale = Sale::create([
+                    'user_id' => Auth::id(),
+                    'total_amount' => $total,
+                    'discount' => $discount,
+                    'amount_received' => $request->amount_received,
+                    'status' => 'completed'  // Sale completed
                 ]);
 
-                // Update inventory
-                $item->product->decrement('inventory_count', $item->quantity);
-            }
+                // Create SaleDetails and update inventory
+                foreach ($cart_items as $item) {
+                    SaleDetail::create([
+                        'sale_id' => $sale->id,
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity,
+                        'amount' => $item->price * $item->quantity // Store total amount for this product
+                    ]);
 
-            // Clear cart and discount session
-            CartItem::where('session_id', session()->getId())->delete();
-            session()->forget('discount');
-        });
+                    // Get the product's associated inventory record
+                    $inventory = $item->product->inventory;
+
+                    // Check if an inventory record exists and decrement the quantity
+                    if ($inventory && $inventory->quantity >= $item->quantity) {
+                        $inventory->decrement('quantity', $item->quantity);
+                    } else {
+                        throw new \Exception('Not enough stock for ' . $item->product->name);
+                    }
+                }
+
+                // Clear cart and discount session
+                Cart::where('session_id', session()->getId())->delete();
+                session()->forget('discount');
+            });
+        } catch (\Exception $e) {
+            return back()->with('error', 'Checkout failed: ' . $e->getMessage());
+        }
+
+        // Ensure $sale is not null before accessing it
+        if (!$sale) {
+            return back()->with('error', 'Failed to complete the sale.');
+        }
 
         $change = $request->amount_received - $total;
 
-        return redirect()->route('pos.receipt')->with([
+        return redirect()->route('pos.receipt', $sale->id)->with([
             'success' => 'Sale completed successfully',
-            'change' => $change
+            'change' => $change,
+            'sale_id' => $sale->id,
+            'sale_items' => $cart_items,
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'total' => $total,
+            'amount_received' => $request->amount_received
         ]);
+    }
+
+    public function receipt(Request $request, $sale_id)
+    {
+        // Retrieve sale details with associated products
+        $sale = Sale::with('saleDetails.product')->find($sale_id);
+
+        if (!$sale) {
+            return redirect()->route('pos.index')->with('error', 'Sale not found.');
+        }
+
+        // Calculate the change if necessary
+        $amount_received = $sale->amount_received;
+        $total = $sale->total_amount;
+        $change = $amount_received - $total;
+
+        return view('pos.receipt', compact('sale', 'change'));
     }
 }

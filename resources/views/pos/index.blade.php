@@ -82,9 +82,16 @@
                             @csrf
                             <div class="mb-4">
                                 <label class="block text-sm text-gray-600 mb-2">Amount Received</label>
-                                <input type="number" name="amount_received" step="0.01" required
+                                <input type="number" id="amountReceived" name="amount_received" step="0.01" required
                                     class="w-full rounded border border-gray-300 px-3 py-2" min="{{ $total }}">
+
                             </div>
+                            {{-- Change Display --}}
+                            <div class="flex justify-between mb-4">
+                                <span class="font-semibold text-gray-700">Change</span>
+                                <span id="changeAmount" class="font-semibold text-gray-800">₱0.00</span>
+                            </div>
+
                             <button type="submit"
                                 class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-200 {{ $cart_items->isEmpty() ? 'opacity-50 cursor-not-allowed' : '' }}"
                                 {{ $cart_items->isEmpty() ? 'disabled' : '' }}>
@@ -179,6 +186,16 @@
         @if (session('success'))
             showToast('success', "{{ session('success') }}");
         @endif
+
+        // Update change when amount received is typed
+        document.getElementById('amountReceived').addEventListener('input', function() {
+            const amountReceived = parseFloat(this.value) || 0;
+            const totalAmount = {{ $total }};
+            const change = amountReceived - totalAmount;
+
+            // Update the change amount
+            document.getElementById('changeAmount').textContent = `₱${change >= 0 ? change.toFixed(2) : '0.00'}`;
+        });
     </script>
 
 </x-admin-layout>

@@ -1,5 +1,5 @@
 <x-layout>
-    <div id="home" class="pt-16">
+    <div id="home">
         <div id="default-carousel" class="relative w-full" data-carousel="slide">
             <!-- Carousel wrapper -->
             <div class="relative h-56 overflow-hidden rounded-lg md:h-96">
@@ -176,11 +176,5 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gradient-to-r from-green-900 to-yellow-900 text-white py-8">
-        <div class="max-w-screen-xl mx-auto px-4">
-            <div class="text-center">
-                <p>&copy; 2024 Calaca Delights. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+
 </x-layout>

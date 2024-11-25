@@ -32,6 +32,11 @@ class Product extends Model
         return number_format($this->price, 2);
     }
 
+    public function getPriceAttribute()
+    {
+        return $this->attributes['price'];
+    }
+
     /**
      * Get the inventory record associated with the product.
      */
@@ -40,4 +45,10 @@ class Product extends Model
         return $this->hasOne(Inventory::class);
     }
 
+    public function reservations(): BelongsToMany
+    {
+        return $this->belongsToMany(Reservation::class, 'reservation_product')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
 }

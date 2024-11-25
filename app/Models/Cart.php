@@ -13,6 +13,11 @@ class Cart extends Model
         return $this->hasMany(CartItem::class);
     }
 
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class, 'cart_id');
+    }
+
     // Method to update the total amount of the cart
     public function updateTotalAmount()
     {

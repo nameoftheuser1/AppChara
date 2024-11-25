@@ -17,6 +17,38 @@ class SaleController extends Controller
         return view('sales.index');
     }
 
+    public function saleIndex(Request $request)
+    {
+        $salesQuery = Sale::with(['saleDetails.product'])
+            ->orderBy('sale_date', 'desc');
+
+        if ($request->has('month')) {
+            $month = $request->input('month');
+            $salesQuery->whereMonth('sale_date', $month);
+        }
+
+        $sales = $salesQuery->get();
+        return view('sales.sales', compact('sales'));
+    }
+
+    public function showSaleDetails($saleId)
+    {
+        $sale = Sale::with(['saleDetails.product'])->findOrFail($saleId);
+        return response()->json([
+            'id' => $sale->id,
+            'sale_date' => $sale->sale_date,
+            'formatted_total_amount' => $sale->formatted_total_amount,
+            'status' => $sale->status,
+            'sale_details' => $sale->saleDetails->map(function ($detail) {
+                return [
+                    'product' => $detail->product,
+                    'quantity' => $detail->quantity,
+                    'product_price' => $detail->product->price,
+                ];
+            }),
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
