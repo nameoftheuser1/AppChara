@@ -27,8 +27,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('sales', SaleController::class);
 
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
-    Route::post('/pos/add-to-cart', [PosController::class, 'addToCart'])->name('pos.addToCart');
-
+    Route::post('/pos/add-item', [PosController::class, 'addItem'])->name('pos.add-item');
+    Route::delete('/pos/remove-item', [PosController::class, 'removeItem'])->name('pos.remove-item');
+    Route::post('/pos/apply-discount', [PosController::class, 'applyDiscount'])->name('pos.apply-discount');
+    Route::post('/pos/checkout', [PosController::class, 'checkout'])->name('pos.checkout');
 
     Route::get('products/{product}/inventory/edit', [InventoryController::class, 'edit'])->name('inventories.edit');
     Route::put('/products/{product}/inventory', [InventoryController::class, 'update'])->name('inventories.update');

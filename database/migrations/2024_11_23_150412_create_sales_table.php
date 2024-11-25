@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->decimal('total_amount', 10, 2);
             $table->decimal('discount', 10, 2)->nullable();
+            $table->decimal('amount_received', 10, 2);  // Added field to capture the amount received
+            $table->string('status')->default('completed');  // Added status field to track sale state
             $table->timestamp('sale_date')->useCurrent();
             $table->timestamps();
         });

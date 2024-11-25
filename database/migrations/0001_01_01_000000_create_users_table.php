@@ -42,7 +42,7 @@ return new class extends Migration
         DB::table('users')->insert([
             'username' => 'admin',
             'email' => 'admin',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('admin'),
             'role' => 'admin',
             'created_at' => now(),
             'updated_at' => now(),

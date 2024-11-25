@@ -15,39 +15,7 @@
 
         <div class="grid grid-cols-12 gap-6">
             {{-- Products Grid --}}
-            <div class="col-span-8">
-                <div class="grid grid-cols-3 gap-4">
-                    @forelse ($products as $product)
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                            onclick="openQuantityModal({{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, {{ $product->inventory_count }})">
-                            @if ($product->img_path)
-                                <img src="{{ asset($product->img_path) }}" alt="{{ $product->name }}"
-                                    class="w-full h-48 object-cover">
-                            @else
-                                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                                    <span class="text-gray-500">No image</span>
-                                </div>
-                            @endif
-                            <div class="p-4">
-                                <h3 class="text-lg font-semibold text-gray-800">{{ $product->name }}</h3>
-                                <div class="mt-2 flex justify-between items-center">
-                                    <span class="text-gray-600">₱{{ number_format($product->price, 2) }}</span>
-                                    <span class="text-sm text-gray-500">Stock: {{ $product->inventory->quantity }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-span-3 text-center py-8">
-                            <p class="text-gray-500">No products found</p>
-                        </div>
-                    @endforelse
-                </div>
-
-                {{-- Pagination --}}
-                <div class="mt-6">
-                    {{ $products->links() }}
-                </div>
-            </div>
+            @include('pos.partials.product-grid')
 
             {{-- Cart Section --}}
             <div class="col-span-4">
@@ -93,7 +61,7 @@
                         </div>
 
                         {{-- Discount Section --}}
-                        {{-- <div class="mb-4">
+                        <div class="mb-4">
                             <form action="{{ route('pos.apply-discount') }}" method="POST" class="flex space-x-2">
                                 @csrf
                                 <input type="number" name="discount" min="0" max="100" step="0.01"
@@ -102,7 +70,7 @@
                                     Apply Discount
                                 </button>
                             </form>
-                        </div> --}}
+                        </div>
 
                         <div class="flex justify-between mb-4">
                             <span class="font-semibold text-gray-700">Total</span>
@@ -110,7 +78,7 @@
                         </div>
 
                         {{-- Payment Section --}}
-                        {{-- <form action="{{ route('pos.checkout') }}" method="POST">
+                        <form action="{{ route('pos.checkout') }}" method="POST">
                             @csrf
                             <div class="mb-4">
                                 <label class="block text-sm text-gray-600 mb-2">Amount Received</label>
@@ -122,7 +90,7 @@
                                 {{ $cart_items->isEmpty() ? 'disabled' : '' }}>
                                 Complete Order
                             </button>
-                        </form> --}}
+                        </form>
                     </div>
                 </div>
             </div>
@@ -130,74 +98,87 @@
     </div>
 
     {{-- Quantity Modal --}}
-    <div id="quantityModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3 text-center">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Add to Cart</h3>
-                <div class="mt-2 px-7 py-3">
-                    <p class="text-sm text-gray-500" id="modalProductName"></p>
-                    <p class="text-sm text-gray-500">Available Stock: <span id="modalStock"></span></p>
+    @include('pos.partials.quantity-modal')
 
-                    {{-- <form action="{{ route('pos.add-item') }}" method="POST" id="addToCartForm">
-                        @csrf
-                        <input type="hidden" name="product_id" id="modalProductId">
-                        <div class="mt-4 flex items-center justify-center space-x-3">
-                            <button type="button" onclick="decrementQuantity()"
-                                class="px-3 py-1 bg-gray-200 rounded-lg">-</button>
-                            <input type="number" name="quantity" id="quantityInput" value="1" min="1"
-                                class="w-20 text-center border rounded-lg px-2 py-1">
-                            <button type="button" onclick="incrementQuantity()"
-                                class="px-3 py-1 bg-gray-200 rounded-lg">+</button>
-                        </div>
+    @include('pos.partials.toast-container')
 
-                        <div class="mt-4">
-                            <button type="submit"
-                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                Add to Cart
-                            </button>
-                            <button type="button" onclick="closeQuantityModal()"
-                                class="ml-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
-                                Cancel
-                            </button>
-                        </div>
-                    </form> --}}
-                </div>
-            </div>
-        </div>
-    </div>
+    <script>
+        let currentStock = 0;
 
-    @push('scripts')
-        <script>
-            let currentStock = 0;
+        function showToast(type, message) {
+            const toast = $(`#${type}-toast`);
+            const messageElement = $(`#${type}-message`);
 
-            function openQuantityModal(productId, productName, price, stock) {
-                currentStock = stock;
-                document.getElementById('modalProductId').value = productId;
-                document.getElementById('modalProductName').textContent = productName;
-                document.getElementById('modalStock').textContent = stock;
-                document.getElementById('quantityInput').value = 1;
-                document.getElementById('quantityModal').classList.remove('hidden');
+            messageElement.text(message);
+            toast.removeClass('hidden translate-x-full').addClass('translate-x-0');
+
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                closeToast(`${type}-toast`);
+            }, 5000);
+        }
+
+        function closeToast(toastId) {
+            const toast = $(`#${toastId}`);
+            toast.addClass('translate-x-full');
+            setTimeout(() => {
+                toast.addClass('hidden');
+            }, 300);
+        }
+
+        function openQuantityModal(productId, productName, price, stock) {
+            currentStock = stock;
+            $('#modalProductId').val(productId);
+            $('#modalProductName').text(productName);
+            $('#modalStock').text(stock);
+            $('#quantityInput').val(1);
+            $('#quantityModal').removeClass('hidden');
+        }
+
+        function closeQuantityModal() {
+            $('#quantityModal').addClass('hidden');
+        }
+
+        function incrementQuantity() {
+            const input = $('#quantityInput');
+            const currentValue = parseInt(input.val()) || 0;
+            if (currentValue < currentStock) {
+                input.val(currentValue + 1);
+            } else {
+                showToast('error', 'Cannot exceed available stock');
             }
+        }
 
-            function closeQuantityModal() {
-                document.getElementById('quantityModal').classList.add('hidden');
+        function decrementQuantity() {
+            const input = $('#quantityInput');
+            const currentValue = parseInt(input.val()) || 0;
+            if (currentValue > 1) {
+                input.val(currentValue - 1);
             }
+        }
 
-            function incrementQuantity() {
-                const input = document.getElementById('quantityInput');
-                const currentValue = parseInt(input.value) || 0;
-                if (currentValue < currentStock) {
-                    input.value = currentValue + 1;
-                }
+        // Add form validation
+        $('#addToCartForm').on('submit', function(e) {
+            const quantity = parseInt($('#quantityInput').val());
+            if (quantity > currentStock) {
+                e.preventDefault();
+                showToast('error', 'Quantity cannot exceed available stock');
             }
+        });
 
-            function decrementQuantity() {
-                const input = document.getElementById('quantityInput');
-                const currentValue = parseInt(input.value) || 0;
-                if (currentValue > 1) {
-                    input.value = currentValue - 1;
-                }
-            }
-        </script>
-    @endpush
+        // Handle session messages
+        @if (session('error'))
+            showToast('error', "{{ session('error') }}");
+        @endif
+
+        @if (session('change'))
+            showToast('success', "Change amount: ₱{{ number_format(session('change'), 2) }}");
+        @endif
+
+        // Optional: Add success message for when items are added to cart
+        @if (session('success'))
+            showToast('success', "{{ session('success') }}");
+        @endif
+    </script>
+
 </x-admin-layout>

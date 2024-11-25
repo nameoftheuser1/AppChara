@@ -27,14 +27,13 @@ class AuthController extends Controller
 
         // Check for admin login first (using manual hardcoded check)
         if (Auth::attempt(['email' => $fields['email'], 'password' => $fields['password']], $request->remember)) {
-            return redirect()->intended('/');
+            return redirect()->intended('/dashboard');
         }
-
 
         // Now attempt regular user login using Laravel's Auth::attempt
         if (Auth::attempt(['email' => $fields['email'], 'password' => $fields['password']], $request->remember)) {
             // If login is successful, redirect to intended page
-            return redirect()->intended('/'); // You can adjust the redirect URL here
+            return redirect()->intended('/dashboard'); // You can adjust the redirect URL here
         }
 
         // If credentials don't match, return error

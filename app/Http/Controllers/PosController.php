@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\Sale;
+use App\Models\SaleDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PosController extends Controller
 {
+
     public function index(Request $request)
     {
         $query = Product::query();
@@ -22,9 +27,12 @@ class PosController extends Controller
             ->orderBy('name')
             ->paginate(12);
 
-        $cart_items = CartItem::with('product')
+
+        $cart = Cart::with('items.product')
             ->where('session_id', session()->getId())
-            ->get();
+            ->first();
+
+        $cart_items = $cart ? $cart->items : collect();
 
         $subtotal = $cart_items->sum(function ($item) {
             return $item->price * $item->quantity;
@@ -45,12 +53,17 @@ class PosController extends Controller
 
         $product = Product::findOrFail($request->product_id);
 
-        if ($product->inventory_count < $request->quantity) {
+        // Check if sufficient stock is available
+        if ($product->inventory->quantity < $request->quantity) {
             return back()->with('error', 'Insufficient stock');
         }
 
-        CartItem::create([
-            'session_id' => session()->getId(),
+        // Find or create the current session's cart
+        $cart = Cart::firstOrCreate(['session_id' => session()->getId()]);
+
+        // Add the item to the cart
+        $cartItem = CartItem::create([
+            'cart_id' => $cart->id,
             'product_id' => $product->id,
             'quantity' => $request->quantity,
             'price' => $product->price
@@ -61,11 +74,25 @@ class PosController extends Controller
 
     public function removeItem(Request $request)
     {
-        CartItem::where('id', $request->item_id)
-            ->where('session_id', session()->getId())
-            ->delete();
+        // Validate the item_id
+        $validated = $request->validate([
+            'item_id' => ['required', 'integer', 'exists:cart_items,id'],
+        ]);
 
-        return back()->with('success', 'Item removed from cart');
+        // Find the cart item by item_id and session_id
+        $cartItem = CartItem::where('id', $validated['item_id'])
+            ->whereHas('cart', function ($query) {
+                $query->where('session_id', session()->getId());
+            })
+            ->first();
+
+        // If the cart item exists, delete it
+        if ($cartItem) {
+            $cartItem->delete();
+            return back()->with('success', 'Item removed from cart');
+        } else {
+            return back()->with('error', 'Item not found in the cart');
+        }
     }
 
     public function applyDiscount(Request $request)
@@ -104,26 +131,30 @@ class PosController extends Controller
             return back()->with('error', 'Insufficient payment amount');
         }
 
-        DB::transaction(function () use ($cart_items, $total, $discount) {
+        DB::transaction(function () use ($cart_items, $total, $discount, $request) {
+            // Create the Sale entry
             $sale = Sale::create([
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'total_amount' => $total,
-                'discount_percentage' => $discount
+                'discount' => $discount,
+                'amount_received' => $request->amount_received,
+                'status' => 'completed'  // Sale completed
             ]);
 
+            // Create SaleDetails and update inventory
             foreach ($cart_items as $item) {
-                SaleItem::create([
+                SaleDetail::create([
                     'sale_id' => $sale->id,
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
-                    'price' => $item->price
+                    'amount' => $item->price * $item->quantity // Store total amount for this product
                 ]);
 
                 // Update inventory
                 $item->product->decrement('inventory_count', $item->quantity);
             }
 
-            // Clear cart
+            // Clear cart and discount session
             CartItem::where('session_id', session()->getId())->delete();
             session()->forget('discount');
         });
