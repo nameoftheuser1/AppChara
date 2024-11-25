@@ -19,6 +19,7 @@ class Reservation extends Model
         'pick_up_date',
         'order_id',
         'status',
+        'email',
     ];
 
     public function order(): BelongsTo

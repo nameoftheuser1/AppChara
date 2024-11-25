@@ -1,8 +1,13 @@
 <x-layout>
     <div class="col-span-8 mx-auto container">
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Product Reservation</h1>
-            <p class="text-gray-600 mt-2">Select products and quantities for your reservation</p>
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Product Reservation</h1>
+                <p class="text-gray-600 mt-2">Select products and quantities for your reservation</p>
+            </div>
+            <div class="rounded-lg bg-green-800 text-white p-2">
+                <a href="{{ route('check.status.form') }}">Check Status of your order here</a>
+            </div>
         </div>
 
         <form action="{{ route('reservation-form.store') }}" method="POST" id="reservationForm">

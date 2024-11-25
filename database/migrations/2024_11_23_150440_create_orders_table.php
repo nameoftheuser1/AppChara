@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('transaction_key')->unique();
             $table->decimal('total_amount', 10, 2);
-            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed']);
+            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed', 'processing', 'ready to pickup']);
             $table->timestamps();
         });
     }

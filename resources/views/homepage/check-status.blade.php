@@ -1,5 +1,12 @@
 <x-layout>
     <div class="col-span-8 mx-auto container">
+        <div class=" p-2 text-blue-500">
+            <a href="{{ route('reservation-form.form') }}"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+            </a>
+        </div>
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-800">Check Reservation Status</h1>
             <p class="text-gray-600 mt-2">Enter your transaction key to check your reservation status</p>
@@ -19,7 +26,8 @@
                     <div>
                         <label for="transaction_key" class="block text-sm font-medium text-gray-700">Transaction
                             Key</label>
-                        <input type="text" name="transaction_key" id="transaction_key" required
+                        <input type="text" name="transaction_key" id="transaction_key"
+                            value="{{ session('transaction_key') }}" required
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
                     </div>
                     <div class="text-right">
@@ -32,7 +40,7 @@
             </div>
         @else
             {{-- Order Status Display --}}
-            <div class="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
+            <div id="printable-content" class="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-6">
                         <div>
@@ -79,7 +87,8 @@
                                     <div class="text-right">
                                         <p class="text-gray-800 font-semibold">
                                             ₱{{ number_format($detail->amount, 2) }}</p>
-                                        <p class="text-sm text-gray-600">₱{{ number_format($detail->product->price, 2) }} each
+                                        <p class="text-sm text-gray-600">
+                                            ₱{{ number_format($detail->product->price, 2) }} each
                                         </p>
                                     </div>
                                 </div>
@@ -111,8 +120,8 @@
                 </div>
             </div>
 
-            {{-- Back Button --}}
-            <div class="mt-6">
+            {{-- Action Buttons --}}
+            <div class="mt-6 flex items-center justify-between">
                 <a href="{{ route('check.status.form') }}"
                     class="inline-flex items-center text-gray-600 hover:text-gray-800">
                     <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -122,7 +131,50 @@
                     </svg>
                     Check Another Order
                 </a>
+                <button onclick="printOrder()"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print Order
+                </button>
             </div>
         @endif
     </div>
+
+    {{-- Add this script section at the bottom of your layout or in a separate JS file --}}
+    <script>
+        function printOrder() {
+            window.print();
+        }
+    </script>
+
+    {{-- Add print-specific styles --}}
+    <style media="print">
+        @page {
+            margin: 1cm;
+        }
+
+        body * {
+            visibility: hidden;
+        }
+
+        #printable-content,
+        #printable-content * {
+            visibility: visible;
+        }
+
+        #printable-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    </style>
 </x-layout>

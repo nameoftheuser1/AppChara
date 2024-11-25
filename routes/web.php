@@ -9,6 +9,7 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\StatusUpdateController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes for guests only
@@ -35,6 +36,17 @@ Route::middleware('auth')->group(function () {
     Route::resource('sales', SaleController::class);
     Route::get('/sale/sales', [SaleController::class, 'saleIndex'])->name('sales.list');
     Route::get('/sale/sales/{saleId}', [SaleController::class, 'showSaleDetails'])->name('sales.showDetails');
+
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/pending', [ReservationController::class, 'pendingIndex'])->name('reservations.pending');
+    Route::get('/reservations/processing', [ReservationController::class, 'processingIndex'])->name('reservations.processing');
+    Route::get('/reservations/ready-to-pickup', [ReservationController::class, 'readyToPickUpIndex'])->name('reservations.ready-to-pickup');
+    Route::get('/reservations/complete', [ReservationController::class, 'completeIndex'])->name('reservations.complete');
+    Route::get('/reservations/all', [ReservationController::class, 'allIndex'])->name('reservations.all');
+
+    Route::patch('/reservations/{order}/process', [StatusUpdateController::class, 'process'])->name('reservations.process');
+    Route::patch('/reservations/{order}/ready-to-pickup', [StatusUpdateController::class, 'readyToPickup'])->name('reservations.ready-to-pickup.update');
+    Route::patch('/reservations/{order}/complete', [StatusUpdateController::class, 'complete'])->name('reservations.complete.update');
 
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('/pos/add-item', [PosController::class, 'addItem'])->name('pos.add-item');
