@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
     <title>{{ env('APP_NAME') }}</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
@@ -76,7 +77,8 @@
                 </li>
                 <li>
                     <a href="{{ route('reservations.index') }}"
-                        class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group">
+                        class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group
+                        {{ request()->routeIs('reservations.index', 'reservations.ready-to-pickup', 'pos.index') ? 'bg-white/25 shadow-md' : '' }}">
                         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path
@@ -91,7 +93,7 @@
             <div class="pt-2 mt-2 border-t border-white/20">
                 <ul class="space-y-2 font-medium">
                     <li>
-                        <a href="#"
+                        <a href="{{ route('settings.index') }}"
                             class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group">
                             <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 20 20">

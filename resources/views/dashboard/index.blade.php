@@ -1,50 +1,65 @@
 <x-admin-layout>
-    <div class="container min-gh-w">
-        <h1>Dashboard</h1>
+    <div class="container min-h-screen">
+        <h1>AppChara Dashboard</h1>
 
         <div class="max-h-56 h-2">
-            <div id="chart"></div>
+            <div class="bg-white rounded-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">5-Month Combined Sales & Orders</h3>
+                <div class="space-y-4">
+                    <!-- Iterate through historical data for the last 5 months -->
+                    @foreach ($historicalData as $monthData)
+                        <div class="flex justify-between items-center border-b py-2">
+                            <span
+                                class="text-gray-600">{{ \Carbon\Carbon::createFromFormat('Y-m', "{$monthData->year}-{$monthData->month}")->format('F Y') }}</span>
+                            <div class="flex items-center">
+                                <span class="mr-4 text-gray-500">Total Amount: </span>
+                                <span
+                                    class="font-semibold text-gray-800">{{ number_format($monthData->total_amount, 2) }}</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            <div id="chart" class="mt-5 bg-white rounded-lg p-6"></div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
         <script>
-            // Data passed from the controller
-            const salesData = @json($salesData);
-            const predictions = @json($predictions);
-
-            // Prepare sales data for the chart
-            const months = salesData.map(data => `${data.month}-${data.year}`);
-            const totalSales = salesData.map(data => data.total_amount);
-
-            // Create a chart with sales data and predictions
-            const options = {
+            var options = {
                 chart: {
                     type: 'line',
                     height: 350
                 },
                 series: [{
-                        name: 'Actual Sales',
-                        data: totalSales
-                    },
-                    {
-                        name: 'Predicted Sales',
-                        data: predictions // Predictions for next 3 months
-                    }
-                ],
+                    name: 'Sales',
+                    data: @json($data)
+                }],
                 xaxis: {
-                    categories: [...months, 'Prediction 1', 'Prediction 2', 'Prediction 3'] // Append prediction months
+                    categories: @json($categories)
                 },
-                title: {
-                    text: 'Sales Data and Predictions',
-                    align: 'center'
+                annotations: {
+                    xaxis: [{
+                        x: @json($categories[count($categories) - 3]), // Get the start of prediction point
+                        strokeDashArray: 0,
+                        borderColor: '#775DD0',
+                        label: {
+                            borderColor: '#775DD0',
+                            style: {
+                                color: '#fff',
+                                background: '#775DD0'
+                            },
+                            text: 'Prediction Start'
+                        }
+                    }]
                 },
-                markers: {
-                    size: 5
+                stroke: {
+                    curve: 'smooth',
+                    dashArray: [0, 5] // Solid line for actual data, dashed for prediction
                 }
             };
 
-            const chart = new ApexCharts(document.querySelector("#chart"), options);
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
             chart.render();
         </script>
     </div>

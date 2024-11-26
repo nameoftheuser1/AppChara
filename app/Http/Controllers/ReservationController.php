@@ -24,6 +24,7 @@ class ReservationController extends Controller
             'processing' => Order::where('status', 'processing')->count(),
             'ready_to_pickup' => Order::where('status', 'ready to pickup')->count(),
             'completed' => Order::where('status', 'completed')->count(),
+            'cancelled' => Order::where('status', 'cancelled')->count(),
             'total' => Order::count(),
         ];
 
@@ -39,6 +40,9 @@ class ReservationController extends Controller
                 ->where('updated_at', '>=', $fourHoursAgo)
                 ->count(),
             'completed' => Order::where('status', 'completed')
+                ->where('updated_at', '>=', $fourHoursAgo)
+                ->count(),
+            'cancelled' => Order::where('status', 'cancelled') // Added cancelled recent updates
                 ->where('updated_at', '>=', $fourHoursAgo)
                 ->count(),
         ];
@@ -60,6 +64,16 @@ class ReservationController extends Controller
 
         return view('reservations.pending-index', [
             'pendingOrders' => $pendingOrders
+        ]);
+    }
+
+    public function cancelIndex(Request $request)
+    {
+        $cancelledOrders = Order::where('status', 'cancelled')
+            ->latest()
+            ->paginate(10);
+        return view('reservations.cancel-index', [
+            'cancelledOrders' => $cancelledOrders
         ]);
     }
 
@@ -132,48 +146,6 @@ class ReservationController extends Controller
         ]);
     }
 
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Reservation $reservation)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Reservation $reservation)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Reservation $reservation)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Reservation $reservation)
-    {
-        //
-    }
 
     public function reservationForm()
     {

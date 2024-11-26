@@ -6,6 +6,13 @@
             @include('reservations.partials.buttons')
         </div>
 
+        <!-- Show error message if available -->
+        @if (session('error'))
+            <div class="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
+                <strong>Error:</strong> {{ session('error') }}
+            </div>
+        @endif
+
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">

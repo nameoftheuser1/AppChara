@@ -59,6 +59,15 @@
                                     {{ $order->reservation->pick_up_date ? $order->reservation->pick_up_date->format('M d, Y') : 'No date available' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <form action="{{ route('reservations.cancel.update', $order) }}" method="POST"
+                                        class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit"
+                                            class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 transition-colors duration-200">
+                                            Cancel Order
+                                        </button>
+                                    </form>
                                     <form action="{{ route('reservations.process', $order) }}" method="POST"
                                         class="inline">
                                         @csrf

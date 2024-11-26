@@ -9,6 +9,7 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StatusUpdateController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/admin/change-password', [SettingController::class, 'changePassword'])->name('admin.change-password');
 
     Route::resource('products', ProductController::class);
     Route::resource('expenses', ExpenseController::class);
@@ -42,9 +45,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/reservations/ready-to-pickup', [ReservationController::class, 'readyToPickUpIndex'])->name('reservations.ready-to-pickup');
     Route::get('/reservations/complete', [ReservationController::class, 'completeIndex'])->name('reservations.complete');
     Route::get('/reservations/all', [ReservationController::class, 'allIndex'])->name('reservations.all');
+    Route::get('/reservations/cancel', [ReservationController::class, 'cancelIndex'])->name('reservations.cancel');
+
 
     Route::get('/orders/{order}/reservation', [ReservationController::class, 'showReservation']);
 
+    Route::patch('/reservations/{order}/cancel', [StatusUpdateController::class, 'cancel'])->name('reservations.cancel.update');
     Route::patch('/reservations/{order}/process', [StatusUpdateController::class, 'process'])->name('reservations.process');
     Route::patch('/reservations/{order}/ready-to-pickup', [StatusUpdateController::class, 'readyToPickup'])->name('reservations.ready-to-pickup.update');
     Route::patch('/reservations/{order}/complete', [StatusUpdateController::class, 'complete'])->name('reservations.complete.update');

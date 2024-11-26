@@ -5,6 +5,11 @@
         Back to orders
     </a>
 
+    <a href="{{ route('reservations.cancel') }}"
+        class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 transition-colors duration-200">
+        View Cancelled
+    </a>
+
     <!-- Pending Reservations -->
     <a href="{{ route('reservations.pending') }}"
         class="text-white bg-yellow-600 hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-4 py-2 transition-colors duration-200">

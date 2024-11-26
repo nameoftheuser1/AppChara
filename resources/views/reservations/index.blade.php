@@ -90,7 +90,26 @@
                 </div>
             </a>
 
-            <!-- All Reservations -->
+            <a href="{{ route('reservations.cancel') }}" class="transform transition-all hover:scale-105 duration-200">
+                <div class="p-6 bg-red-50 rounded-lg shadow-sm border border-red-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="p-3 bg-red-100 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-700" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-red-600">Cancelled</p>
+                                <p class="text-2xl font-bold text-red-900">{{ $counts['cancelled'] }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
             <a href="{{ route('reservations.all') }}" class="transform transition-all hover:scale-105 duration-200">
                 <div class="p-6 bg-gray-50 rounded-lg shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between">
@@ -142,10 +161,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                        @if ($order->status === 'pending') bg-yellow-100 text-yellow-800
-                                        @elseif($order->status === 'processing') bg-blue-100 text-blue-800
-                                        @elseif($order->status === 'ready to pickup') bg-purple-100 text-purple-800
-                                        @elseif($order->status === 'completed') bg-green-100 text-green-800 @endif">
+                                            @if ($order->status === 'pending') bg-yellow-100 text-yellow-800
+                                            @elseif($order->status === 'processing') bg-blue-100 text-blue-800
+                                            @elseif($order->status === 'ready to pickup') bg-purple-100 text-purple-800
+                                            @elseif($order->status === 'completed') bg-green-100 text-green-800
+                                            @elseif($order->status === 'cancelled') bg-red-100 text-red-800 @endif">
                                             {{ ucfirst($order->status) }}
                                         </span>
                                     </td>
