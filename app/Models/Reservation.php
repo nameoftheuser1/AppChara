@@ -19,7 +19,6 @@ class Reservation extends Model
         'coupon',
         'pick_up_date',
         'order_id',
-        'status',
         'email',
     ];
 

@@ -13,7 +13,9 @@ class StatusUpdateController extends Controller
     {
         $order->update(['status' => 'processing']);
 
-        $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+        if ($order->reservation) {
+            $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+        }
 
         return redirect()->back()->with('success', 'Order has been moved to processing.');
     }
@@ -22,7 +24,9 @@ class StatusUpdateController extends Controller
     {
         $order->update(['status' => 'cancelled']);
 
-        $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+        if ($order->reservation) {
+            $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+        }
 
         return redirect()->back()->with('success', 'Order has been moved to cancelled.');
     }
@@ -31,7 +35,9 @@ class StatusUpdateController extends Controller
     {
         $order->update(['status' => 'ready to pickup']);
 
-        $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+        if ($order->reservation) {
+            $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+        }
 
         return redirect()->back()->with('success', 'Order has been moved to ready to pickup.');
     }

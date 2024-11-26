@@ -108,13 +108,28 @@ class PosController extends Controller
 
     public function applyDiscount(Request $request)
     {
+        // Validate the discount input as a numeric value
         $request->validate([
-            'discount' => 'required|numeric|min:0|max:100'
+            'discount' => 'required|numeric|min:0', // Accept decimal values
         ]);
 
-        session(['discount' => $request->discount]);
+        // Get the current total from the session or compute it if needed
+        $total = session('total', 0);  // Replace with your actual total calculation if needed
 
-        return back()->with('success', 'Discount applied');
+        // Get the discount amount from the input
+        $discount = $request->discount;
+
+        // Calculate the total after applying the discount
+        $totalAfterDiscount = $total - $discount;
+
+        // Ensure that the total is not negative
+        $totalAfterDiscount = max($totalAfterDiscount, 0);
+
+        // Store the updated total and discount in the session
+        session(['total' => $totalAfterDiscount]);
+        session(['discount' => $discount]);
+
+        return back()->with('success', 'Discount applied successfully');
     }
 
     public function checkout(Request $request)

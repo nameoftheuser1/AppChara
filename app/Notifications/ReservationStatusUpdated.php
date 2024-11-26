@@ -29,10 +29,13 @@ class ReservationStatusUpdated extends Notification
     // The toMail method builds the email content
     public function toMail($notifiable)
     {
+        $order = $this->reservation->order;
+
         return (new MailMessage)
             ->subject('Your Reservation Status has been Updated')
             ->line("Dear {$this->reservation->name},")
-            ->line("Your reservation status has been updated to: {$this->reservation->status}.")
+            ->line("Your reservation status has been updated to: {$order->status}.")
+            ->line("Your transaction key is: {$order->transaction_key}")
             ->line('Thank you for choosing our service!')
             ->action('View Reservation', url('/check-status'));
     }
@@ -42,7 +45,8 @@ class ReservationStatusUpdated extends Notification
     {
         return [
             'reservation_id' => $this->reservation->id,
-            'status' => $this->reservation->status,
+            'status' => $this->reservation->order->status,
+            'transaction_key' => $this->reservation->order->transaction_key,
         ];
     }
 }

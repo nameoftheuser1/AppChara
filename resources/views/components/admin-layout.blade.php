@@ -62,6 +62,18 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('inventories.index') }}"
+                        class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group
+                        {{ request()->routeIs('inventories.index') ? 'bg-white/25 shadow-md' : '' }}">
+                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path
+                                d="M11.074 4 8.442.408A.5.5 0 0 0 8 .188a.5.5 0 0 0-.442.22L4.926 4H1.5A1.5 1.5 0 0 0 0 5.5v9A1.5 1.5 0 0 0 1.5 16h17a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 18.5 4h-7.426ZM8 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" />
+                        </svg>
+                        <span class="ml-3 font-medium">Inventories</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('sales.index') }}"
                         class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group
                         {{ request()->routeIs('sales.index', 'sales.create', 'sales.edit', 'pos.index') ? 'bg-white/25 shadow-md' : '' }}">

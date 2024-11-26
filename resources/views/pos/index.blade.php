@@ -64,7 +64,7 @@
                         <div class="mb-4">
                             <form action="{{ route('pos.apply-discount') }}" method="POST" class="flex space-x-2">
                                 @csrf
-                                <input type="number" name="discount" min="0" max="100" step="0.01"
+                                <input type="number" name="discount" min="0" step="0.01"
                                     class="w-20 rounded border border-gray-300 px-2 py-1" value="{{ $discount ?? 0 }}">
                                 <button type="submit" class="px-3 py-1 bg-gray-200 rounded text-sm">
                                     Apply Discount
