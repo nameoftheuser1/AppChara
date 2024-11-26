@@ -58,7 +58,7 @@
 
                                     <input type="number" id="quantity-{{ $product->id }}"
                                         name="products[{{ $product->id }}]" value="0" min="0"
-                                        max="{{ $product->inventory->quantity }}" data-price="{{ $product->price }}"
+                                        data-price="{{ $product->price }}"
                                         class="product-quantity block w-20 text-center rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
 
                                     <button type="button"
@@ -283,7 +283,7 @@
                         $('#submit-btn').prop('disabled', false);
                         alert(
                             'The reservation process is taking longer than expected. Please try again.'
-                            );
+                        );
                     }
                 }, 60000); // 60 seconds timeout
             });
