@@ -44,11 +44,4 @@ class Product extends Model
     {
         return $this->hasOne(Inventory::class);
     }
-
-    public function reservations(): BelongsToMany
-    {
-        return $this->belongsToMany(Reservation::class, 'reservation_product')
-            ->withPivot('quantity')
-            ->withTimestamps();
-    }
 }

@@ -87,7 +87,7 @@ class ReservationController extends Controller
 
     public function completeIndex(Request $request)
     {
-        $completeOrders = Order::where('status', 'complete')
+        $completeOrders = Order::where('status', 'completed')
             ->latest()
             ->paginate(10);
 
@@ -104,6 +104,35 @@ class ReservationController extends Controller
             'allOrders' => $allOrders,
         ]);
     }
+
+    public function showReservation(Order $order)
+    {
+        $reservation = $order->reservation->load([
+            'order.orderDetails.product' => function ($query) {
+                $query->select('id', 'name', 'price', 'img_path');
+            }
+        ]);
+
+        $orderDetails = $order->orderDetails->map(function ($detail) {
+            return [
+                'product_name' => $detail->product->name,
+                'product_price' => number_format($detail->product->price, 2),
+                'quantity' => $detail->quantity,
+                'subtotal' => number_format($detail->quantity * $detail->product->price, 2),
+                'product_image' => $detail->product->img_path ? asset($detail->product->img_path) : null,
+            ];
+        });
+
+        // Include status explicitly in the reservation response
+        return response()->json([
+            'reservation' => array_merge($reservation->toArray(), [
+                'status' => $order->status,
+            ]),
+            'order_details' => $orderDetails,
+        ]);
+    }
+
+
 
     /**
      * Show the form for creating a new resource.

@@ -4,18 +4,18 @@
             <!-- Carousel wrapper -->
             <div class="relative h-56 overflow-hidden rounded-lg md:h-96">
                 <!-- Item 1 -->
-                <div class="hidden duration-700 ease-in-out" data-carousel-item>
-                    <img src="/api/placeholder/1200/600"
+                <div class="hidden duration-3000 ease-in-out" data-carousel-item>
+                    <img src="{{ asset('img/calaca.webp') }}"
                         class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Lomi">
                     <div
                         class="absolute inset-0 bg-gradient-to-r from-green-900/70 to-yellow-900/70 flex items-center justify-center">
                         <div class="text-center text-white">
-                            <h2 class="text-4xl font-bold mb-4">Famous Calaca Lomi</h2>
-                            <p class="text-xl">Experience the rich and hearty flavors of our signature dish</p>
+                            <h2 class="text-4xl font-bold mb-4">AppChara</h2>
+                            <p class="text-xl">Add a Zing to Every Meal with Our Freshly Made Atchara!</p>
                         </div>
                     </div>
                 </div>
-                <div class="hidden duration-700 ease-in-out" data-carousel-item>
+                {{-- <div class="hidden duration-3000 ease-in-out" data-carousel-item>
                     <img src="/api/placeholder/1200/600"
                         class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Lomi">
                     <div
@@ -25,12 +25,12 @@
                             <p class="text-xl">Experience the rich and hearty flavors of our signature dish</p>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 <!-- Additional carousel items with same gradient overlay -->
                 <!-- Item 2 and 3 similar structure -->
             </div>
             <!-- Slider controls -->
-            <button type="button"
+            {{-- <button type="button"
                 class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
                 data-carousel-prev>
                 <span
@@ -53,7 +53,7 @@
                             d="m1 9 4-4-4-4" />
                     </svg>
                 </span>
-            </button>
+            </button> --}}
         </div>
     </div>
 
@@ -64,29 +64,30 @@
             <!-- Food Items with updated styling -->
             <div
                 class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-green-100">
-                <img src="/api/placeholder/400/300" alt="Lomi" class="w-full h-48 object-cover">
+                <img src="{{ asset('img/papaya-default.jpg') }}" alt="Lomi" class="w-full h-48 object-cover">
                 <div class="p-6">
-                    <h3 class="text-xl font-bold mb-2 text-green-800">Burong Bawang</h3>
-                    <p class="text-green-700">Burong bawang is a pickled garlic dish</p>
+                    <h3 class="text-xl font-bold mb-2 text-green-800">Papaya</h3>
+                    <p class="text-green-700">Papaya atchara is a Filipino-style pickled green papaya. It pairs
+                        perfectly with grilled and fried dishes, enhancing the overall dining experience.</p>
                 </div>
             </div>
             <div
                 class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-green-100">
-                <img src="/api/placeholder/400/300" alt="Lomi" class="w-full h-48 object-cover">
+                <img src="{{ asset('img/ampalaya.jpg') }}" alt="Lomi" class="w-full h-48 object-cover">
                 <div class="p-6">
-                    <h3 class="text-xl font-bold mb-2 text-green-800">Labong</h3>
-                    <p class="text-green-700">Labong is the local name for bamboo shoots, a versatile vegetable with a
-                        mildly sweet and earthy taste.</p>
+                    <h3 class="text-xl font-bold mb-2 text-green-800">Ampalaya</h3>
+                    <p class="text-green-700">Atcharang ampalaya, or pickled bitter gourd, is a tangy and refreshing
+                        side dish that pairs perfectly with fried foods.</p>
                 </div>
             </div>
-            <div
+            {{-- <div
                 class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-green-100">
                 <img src="/api/placeholder/400/300" alt="Lomi" class="w-full h-48 object-cover">
                 <div class="p-6">
                     <h3 class="text-xl font-bold mb-2 text-green-800">Ubod</h3>
                     <p class="text-green-700">The edible pith derived from coconut trunks</p>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Additional food items with same styling -->
         </div>
@@ -117,7 +118,7 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-16">
+    {{-- <section id="contact" class="py-16">
         <div class="max-w-screen-xl mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-12 text-green-800">Contact Us</h2>
             <div class="grid md:grid-cols-2 gap-8">
@@ -173,7 +174,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <!-- Footer -->
 

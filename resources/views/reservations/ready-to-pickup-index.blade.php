@@ -3,10 +3,7 @@
         <div class="flex justify-between items-center">
             <h2 class="text-2xl font-bold text-gray-900">Ready to Pick Up Orders</h2>
             <!-- Back Button -->
-            <a href="{{ route('reservations.index') }}"
-                class="text-white bg-gray-600 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 transition-colors duration-200">
-                Back to Reservations
-            </a>
+            @include('reservations.partials.buttons')
         </div>
 
         <div class="bg-white rounded-lg shadow overflow-hidden">

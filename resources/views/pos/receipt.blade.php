@@ -61,7 +61,7 @@
             </div>
             <div class="flex justify-between text-sm">
                 <span>Change:</span>
-                <span>₱{{ number_format($sale->change, 2) }}</span>
+                <span>₱{{ number_format($sale->amount_received - $sale->total_amount, 2) }}</span>
             </div>
         </div>
 

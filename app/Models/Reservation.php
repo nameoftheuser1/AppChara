@@ -32,10 +32,4 @@ class Reservation extends Model
         'status' => 'string',
     ];
 
-    public function products(): BelongsToMany
-    {
-        return $this->belongsToMany(Product::class, 'reservation_product')
-            ->withPivot('quantity')
-            ->withTimestamps();
-    }
 }

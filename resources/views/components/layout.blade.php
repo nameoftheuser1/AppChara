@@ -27,15 +27,15 @@
                         <li><a href="{{ route('home.index') }}"
                                 class="block py-2 pl-3 pr-4 text-green-800 rounded hover:text-green-600 md:p-0 transition-colors">Home</a>
                         </li>
-                        <li><a href="#specialties"
+                        {{-- <li><a href="#specialties"
                                 class="block py-2 pl-3 pr-4 text-green-800 rounded hover:text-green-600 md:p-0 transition-colors">Specialties</a>
-                        </li>
+                        </li> --}}
                         <li><a href="{{ route('reservation-form.form') }}"
                                 class="block py-2 pl-3 pr-4 text-green-800 rounded hover:text-green-600 md:p-0 transition-colors">Order</a>
                         </li>
-                        <li><a href="#contact"
+                        {{-- <li><a href="#contact"
                                 class="block py-2 pl-3 pr-4 text-green-800 rounded hover:text-green-600 md:p-0 transition-colors">Contact</a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </div>
             </div>
@@ -48,7 +48,7 @@
     <footer class="bg-gradient-to-r from-green-900 to-yellow-900 text-white py-8">
         <div class="max-w-screen-xl mx-auto px-4">
             <div class="text-center">
-                <p>&copy; 2024 Calaca Delights. All rights reserved.</p>
+                <p>&copy; 2024 AppChara. All rights reserved.</p>
             </div>
         </div>
     </footer>

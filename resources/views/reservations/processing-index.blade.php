@@ -3,10 +3,7 @@
         <div class="flex justify-between items-center">
             <h2 class="text-2xl font-bold text-gray-900">Processing Orders</h2>
             <!-- Back Button -->
-            <a href="{{ route('reservations.index') }}"
-                class="text-white bg-gray-600 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 transition-colors duration-200">
-                Back to Reservations
-            </a>
+            @include('reservations.partials.buttons')
         </div>
 
         <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -62,13 +59,13 @@
                                     {{ $order->reservation->pick_up_date ? $order->reservation->pick_up_date->format('M d, Y') : 'No date available' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <form action="{{ route('reservations.ready-to-pickup.update', $order) }}" method="POST"
-                                        class="inline">
+                                    <form action="{{ route('reservations.ready-to-pickup.update', $order) }}"
+                                        method="POST" class="inline">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit"
                                             class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 transition-colors duration-200">
-                                            Mark as Complete
+                                            Ready to pickup
                                         </button>
                                     </form>
                                 </td>
