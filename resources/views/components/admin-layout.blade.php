@@ -78,7 +78,7 @@
                 <li>
                     <a href="{{ route('reservations.index') }}"
                         class="flex items-center p-3 text-white rounded-lg hover:bg-white/25 hover:shadow-md transition-all duration-200 group
-                        {{ request()->routeIs('reservations.index', 'reservations.ready-to-pickup', 'pos.index') ? 'bg-white/25 shadow-md' : '' }}">
+                        {{ request()->routeIs('reservations.index', 'reservations.ready-to-pickup') ? 'bg-white/25 shadow-md' : '' }}">
                         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path

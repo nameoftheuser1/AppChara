@@ -22,11 +22,15 @@ class DashboardController extends Controller
         $categories = $chartData->pluck('month')->toArray();
         $data = $chartData->pluck('total_amount')->toArray();
 
+        // Get fast moving products
+        $fastMovingProducts = $this->getFastMovingProducts();
+
         // Pass the prepared data to the view
         return view('dashboard.index', [
             'historicalData' => $historicalData,
             'categories' => $categories,
             'data' => $data,
+            'fastMovingProducts' => $fastMovingProducts,
         ]);
     }
 
@@ -50,7 +54,6 @@ class DashboardController extends Controller
             ->orderByRaw('year, month')
             ->get();
     }
-
 
     private function predictNextThreeMonths($historicalData)
     {
@@ -98,5 +101,32 @@ class DashboardController extends Controller
         });
 
         return $chartData->merge($predictedData);
+    }
+
+    private function getFastMovingProducts()
+    {
+        // Calculate total quantity sold and ordered for each product in the last 3 months
+        $fastMovingProducts = DB::table('products')
+            ->select(
+                'products.id',
+                'products.name',
+                DB::raw('COALESCE(SUM(sale_details.quantity), 0) as total_sales_quantity'),
+                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_order_quantity'),
+                DB::raw('COALESCE(SUM(sale_details.quantity), 0) + COALESCE(SUM(order_details.quantity), 0) as total_quantity')
+            )
+            ->leftJoin('sale_details', function ($join) {
+                $join->on('sale_details.product_id', '=', 'products.id')
+                    ->whereRaw('sale_details.created_at >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)');
+            })
+            ->leftJoin('order_details', function ($join) {
+                $join->on('order_details.product_id', '=', 'products.id')
+                    ->whereRaw('order_details.created_at >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)');
+            })
+            ->groupBy('products.id', 'products.name')
+            ->orderBy('total_quantity', 'desc')
+            ->limit(10) // Top 10 fast-moving products
+            ->get();
+
+        return $fastMovingProducts;
     }
 }
