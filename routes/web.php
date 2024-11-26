@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/admin/change-password', [SettingController::class, 'changePassword'])->name('admin.change-password');
+    Route::post('/admin/change-email', [SettingController::class, 'changeEmail'])->name('admin.change-email');
 
     Route::resource('products', ProductController::class);
     Route::resource('expenses', ExpenseController::class);

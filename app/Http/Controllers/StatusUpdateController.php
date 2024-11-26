@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Notifications\ReservationStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -11,18 +12,27 @@ class StatusUpdateController extends Controller
     public function process(Order $order)
     {
         $order->update(['status' => 'processing']);
+
+        $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+
         return redirect()->back()->with('success', 'Order has been moved to processing.');
     }
 
     public function cancel(Order $order)
     {
         $order->update(['status' => 'cancelled']);
+
+        $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+
         return redirect()->back()->with('success', 'Order has been moved to cancelled.');
     }
 
     public function readyToPickUp(Order $order)
     {
         $order->update(['status' => 'ready to pickup']);
+
+        $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+
         return redirect()->back()->with('success', 'Order has been moved to ready to pickup.');
     }
 
@@ -50,8 +60,14 @@ class StatusUpdateController extends Controller
                 }
             }
 
-            // Commit the transaction if everything is successful
+            // Commit the transaction
             DB::commit();
+
+            // Find the reservation linked to the order
+            $reservation = $order->reservation;
+
+            // Notify the user about the status update
+            $reservation->notify(new ReservationStatusUpdated($reservation));
 
             return redirect()->back()->with('success', 'Order has been moved to completed and inventory updated.');
         } catch (\Exception $e) {

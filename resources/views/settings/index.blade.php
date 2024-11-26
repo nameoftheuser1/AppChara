@@ -10,58 +10,80 @@
             @endforeach
         </div>
     @endif
-    <!-- Trigger Button for Modal -->
-    <button id="openModal" class="px-4 py-2 bg-blue-500 text-white rounded">Change Password</button>
 
-    <!-- Modal Structure -->
-    <div id="passwordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 hidden">
-        <div class="fixed inset-0 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                <h2 class="text-2xl mb-4">Change Password</h2>
+    <div class="flex flex-col gap-y-2">
+        <!-- Password Change Button -->
+        <!-- Password Change Button -->
+        <button id="openPasswordModal"
+            class="flex items-center p-3 text-white rounded-lg hover:bg-green-600 hover:shadow-md transition-all duration-200 group bg-green-500">
+            <svg class="w-5 h-5 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 16 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7.5 1a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM3 10h9a2 2 0 0 1 2 2v3H1v-3a2 2 0 0 1 2-2Z" />
+            </svg>
+            <span class="font-medium">Change Password</span>
+        </button>
 
-                <!-- Success and Error Messages -->
+        <!-- Email Change Button -->
+        <button id="openEmailModal"
+            class="flex items-center p-3 text-white rounded-lg hover:bg-green-600 hover:shadow-md transition-all duration-200 group bg-green-500">
+            <svg class="w-5 h-5 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                viewBox="0 0 20 20">
+                <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5V5h18v-.5A1.5 1.5 0 0 0 17.5 3h-15Z" />
+                <path fill-rule="evenodd"
+                    d="M19 7.5V16.5A1.5 1.5 0 0 1 17.5 18h-15A1.5 1.5 0 0 1 1 16.5V7.645c.37.275.861.52 1.462.71C3.833 8.701 6.132 9 10 9c3.867 0 6.167-.299 7.538-.645.6-.19 1.093-.435 1.462-.71Z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span class="font-medium">Change Email</span>
+        </button>
 
-
-                <form method="POST" action="{{ route('admin.change-password') }}">
-                    @csrf
-                    <div class="mb-4">
-                        <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
-                        <input type="password" name="new_password" id="new_password"
-                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" required />
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700">Confirm
-                            New Password</label>
-                        <input type="password" name="new_password_confirmation" id="new_password_confirmation"
-                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" required />
-                    </div>
-
-                    <div class="flex justify-end">
-                        <button type="button" id="closeModal"
-                            class="px-4 py-2 bg-gray-500 text-white rounded mr-2">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 
+    <!-- Modal Structure for Password Change -->
+    @include('settings.partials.password-modal')
+    <!-- Modal Structure for Email Change -->
+    @include('settings.partials.email-modal')
+
     <script>
-        // Open the modal
-        document.getElementById('openModal').addEventListener('click', function() {
-            document.getElementById('passwordModal').classList.remove('hidden');
+        // Password Modal Handling
+        const openPasswordModal = document.getElementById('openPasswordModal');
+        const passwordModal = document.getElementById('passwordModal');
+        const closePasswordModal = document.getElementById('closePasswordModal');
+        const cancelPasswordModal = document.getElementById('cancelPasswordModal');
+
+        openPasswordModal.addEventListener('click', function() {
+            passwordModal.classList.remove('hidden');
         });
 
-        // Close the modal
-        document.getElementById('closeModal').addEventListener('click', function() {
-            document.getElementById('passwordModal').classList.add('hidden');
+        [closePasswordModal, cancelPasswordModal].forEach(button => {
+            button.addEventListener('click', function() {
+                passwordModal.classList.add('hidden');
+            });
         });
 
-        // Close the modal if clicked outside of it
+        // Email Modal Handling
+        const openEmailModal = document.getElementById('openEmailModal');
+        const emailModal = document.getElementById('emailModal');
+        const closeEmailModal = document.getElementById('closeEmailModal');
+        const cancelEmailModal = document.getElementById('cancelEmailModal');
+
+        openEmailModal.addEventListener('click', function() {
+            emailModal.classList.remove('hidden');
+        });
+
+        [closeEmailModal, cancelEmailModal].forEach(button => {
+            button.addEventListener('click', function() {
+                emailModal.classList.add('hidden');
+            });
+        });
+
+        // Close modal when clicking outside
         window.addEventListener('click', function(event) {
-            if (event.target === document.getElementById('passwordModal')) {
-                document.getElementById('passwordModal').classList.add('hidden');
+            if (event.target === passwordModal) {
+                passwordModal.classList.add('hidden');
+            }
+            if (event.target === emailModal) {
+                emailModal.classList.add('hidden');
             }
         });
     </script>

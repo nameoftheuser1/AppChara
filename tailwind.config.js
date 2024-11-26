@@ -12,7 +12,15 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ["Figtree", ...defaultTheme.fontFamily.sans],
+            },
+            animation: {
+                spin: "spin 1s linear infinite", // Define the animation
+            },
+            keyframes: {
+                spin: {
+                    "100%": { transform: "rotate(360deg)" }, // Define keyframe for the animation
+                },
             },
         },
     },

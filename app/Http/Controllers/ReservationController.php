@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewReservationToClient;
+use App\Mail\ReservationConfirmationToUser;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Reservation;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ReservationController extends Controller
 {
@@ -209,11 +213,17 @@ class ReservationController extends Controller
             'transaction_key' => $transactionKey,
             'name' => $validated['name'],
             'contact_number' => $validated['contact_number'],
-            'email' => $validated['email'],  // Save email to the reservation
+            'email' => $validated['email'],
             'coupon' => $validated['coupon'] ?? null,
             'pick_up_date' => $validated['pick_up_date'],
             'order_id' => $order->id,
         ]);
+
+        // Send confirmation email to the user
+        Mail::to($validated['email'])->send(new ReservationConfirmationToUser($transactionKey, $validated['pick_up_date']));
+
+        $clientEmail = Setting::where('key', 'email')->value('value') ?? 'appchara12@gmail.com';
+        Mail::to($clientEmail)->send(new NewReservationToClient($transactionKey, $validated['name'], $validated['pick_up_date'], $validated['contact_number'], $validated['email']));
 
         // Redirect to the check status form with the transaction key
         return redirect()->route('check.status.form')->with([

@@ -126,6 +126,23 @@
 
     <script>
         $(document).ready(function() {
+            // Create loading overlay function
+            function showLoadingOverlay() {
+                // Create a full-screen loading overlay
+                const loadingOverlay = $(`
+                    <div id="loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-500 mb-4"></div>
+                            <p class="text-gray-800 text-lg">Processing your reservation...</p>
+                            <p class="text-gray-600 text-sm mt-2">Please do not close or refresh the page</p>
+                        </div>
+                    </div>
+                `);
+
+                // Append to body
+                $('body').append(loadingOverlay);
+            }
+
             // Debounce function to limit the rate at which a function is called
             function debounce(func, wait) {
                 let timeout;
@@ -229,7 +246,7 @@
                 }
             });
 
-            // Form validation
+            // Modify the form submission handling
             $('#reservationForm').on('submit', function(e) {
                 const total = parseFloat($('#cart-total').text().replace('₱', '').replace(',', ''));
                 if (total === 0) {
@@ -252,7 +269,25 @@
                     alert('Please correct the quantities before submitting.');
                     return false;
                 }
+
+                // Disable submit button to prevent multiple submissions
+                $('#submit-btn').prop('disabled', true);
+
+                // Show loading overlay
+                showLoadingOverlay();
+
+                // Optional: Add a timeout to handle potential server issues
+                setTimeout(function() {
+                    if ($('#loading-overlay').length) {
+                        $('#loading-overlay').remove();
+                        $('#submit-btn').prop('disabled', false);
+                        alert(
+                            'The reservation process is taking longer than expected. Please try again.'
+                            );
+                    }
+                }, 60000); // 60 seconds timeout
             });
+
 
             // Initialize calculations
             calculateCartTotals();
