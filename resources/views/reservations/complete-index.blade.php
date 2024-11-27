@@ -64,6 +64,15 @@
                                         onclick="showReservationDetails({{ $order->id }})">
                                         View Details
                                     </button>
+                                    <form action="{{ route('reservation.refund', $order->id) }}" method="POST"
+                                        class="inline-block">
+                                        @csrf
+                                        <button type="submit"
+                                            class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 ml-2"
+                                            onclick="showLoadingOverlay()">
+                                            Refund
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -85,4 +94,6 @@
     </div>
 
     @include('reservations.partials.view-details')
+
+    @include('partials.loading-script')
 </x-admin-layout>

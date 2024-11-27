@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
 use App\Models\Order;
 use App\Notifications\ReservationStatusUpdated;
 use Illuminate\Http\Request;
@@ -86,5 +87,47 @@ class StatusUpdateController extends Controller
 
             return redirect()->back()->with('error', 'Error updating order: ' . $e->getMessage());
         }
+    }
+
+    public function cancelOrder($transactionKey)
+    {
+        // Find the order by the transaction key
+        $order = Order::where('transaction_key', $transactionKey)->first();
+
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order not found.');
+        }
+
+        if ($order->status !== 'pending') {
+            return redirect()->back()->with('error', 'You can only cancel pending orders.');
+        }
+
+        $order->status = 'cancelled';
+        $order->save();
+
+        return redirect()->route('check.status.form')->with('success', 'Order has been cancelled successfully.');
+    }
+
+    public function refund($id)
+    {
+        $order = Order::findOrFail($id);
+
+        // Ensure the `products` relationship exists
+        foreach ($order->orderDetails as $detail) {
+            $inventory = Inventory::where('product_id', $detail->product_id)->first();
+            if ($inventory) {
+                $inventory->quantity += $detail->quantity;
+                $inventory->save();
+            }
+        }
+
+        if ($order->reservation) {
+            $order->reservation->update(['status' => 'refunded']);
+            $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+        }
+
+        $order->update(['status' => 'refunded']);
+
+        return redirect()->route('reservations.complete')->with('success', 'Order refunded successfully.');
     }
 }

@@ -168,7 +168,7 @@ class ReservationController extends Controller
             'contact_number' => ['required', 'string', 'regex:/^\d{11}$/'],
             'email' => 'required|email|max:255',
             'coupon' => 'nullable|string|max:50',
-            'pick_up_date' => 'required|date',
+            'pick_up_date' => 'required|date|after_or_equal:' . now()->toDateString(),
             'products' => 'required|array',
             'products.*' => 'integer|min:0',
         ]);

@@ -14,6 +14,7 @@ class Sale extends Model
         'total_amount',
         'discount',
         'amount_received',
+        'refunded_amount',
         'status',
         'sale_date',
     ];

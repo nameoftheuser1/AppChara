@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Phpml\FeatureExtraction\TokensFilter;
+use Phpml\Regression\LeastSquares;
+use Phpml\Regression\SVR;
+use Phpml\Regression\LassoRegression;
 
 class DashboardController extends Controller
 {
@@ -57,14 +61,74 @@ class DashboardController extends Controller
 
     private function predictNextThreeMonths($historicalData)
     {
-        // Extract the total amounts from the historical data
-        $salesTotals = $historicalData->pluck('total_amount')->toArray();
+        // Prepare data for regression
+        $samples = [];
+        $targets = [];
 
-        // Calculate the 3-month moving average
-        $lastThreeMonths = array_slice($salesTotals, -3); // Last 3 months
-        $lastThreeMonthAverage = array_sum($lastThreeMonths) / max(count($lastThreeMonths), 1);
+        // Validate and prepare data
+        if ($historicalData->isEmpty()) {
+            return collect([]);
+        }
 
-        // Predict the next three months with the moving average
+        // Create numeric representation of months with multiple features
+        $historicalData->each(function ($item, $index) use (&$samples, &$targets) {
+            $samples[] = [
+                $index + 1,                     // Sequence index
+                (float)$item->total_amount,     // Previous total amount
+                (int)$item->month,              // Month as feature
+            ];
+            $targets[] = $item->total_amount;
+        });
+
+        // Try multiple regression techniques
+        $regressionMethods = [
+            new LeastSquares(),
+            new SVR()
+        ];
+
+        $predictions = [];
+        $currentYear = now()->year;
+        $currentMonth = now()->month;
+
+        foreach ($regressionMethods as $regression) {
+            try {
+                // Train the regression model
+                $regression->train($samples, $targets);
+
+                // Predict next three months
+                for ($i = 1; $i <= 3; $i++) {
+                    $nextMonth = $currentMonth + $i;
+                    $year = $currentYear + floor(($nextMonth - 1) / 12);
+                    $month = (($nextMonth - 1) % 12) + 1;
+
+                    // Predict using multiple features
+                    $predictedAmount = $regression->predict([
+                        count($samples) + $i,
+                        $targets[count($targets) - 1],
+                        $month
+                    ]);
+
+                    $predictions[] = [
+                        'year' => $year,
+                        'month' => $month,
+                        'total_amount' => max(0, $predictedAmount),
+                    ];
+                }
+
+                return collect($predictions);
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return $this->simpleFallbackPrediction($historicalData);
+    }
+
+
+    private function simpleFallbackPrediction($historicalData)
+    {
+        $averageAmount = $historicalData->avg('total_amount');
+
         $currentYear = now()->year;
         $currentMonth = now()->month;
 
@@ -77,7 +141,7 @@ class DashboardController extends Controller
             $predictions[] = [
                 'year' => $year,
                 'month' => $month,
-                'total_amount' => $lastThreeMonthAverage,
+                'total_amount' => $averageAmount,
             ];
         }
 

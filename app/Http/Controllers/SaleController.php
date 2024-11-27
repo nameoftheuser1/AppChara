@@ -77,7 +77,7 @@ class SaleController extends Controller
             // Create a new sale record
             Sale::create([
                 'sale_date' => $validatedData['sale_date'],
-                'amount_received'=> $validatedData['total_amount'],
+                'amount_received' => $validatedData['total_amount'],
                 'total_amount' => $validatedData['total_amount'],
             ]);
 
@@ -89,29 +89,25 @@ class SaleController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Sale $sale)
+    public function processRefund($saleId)
     {
-        //
+        $sale = Sale::findOrFail($saleId);
+
+        // Update refunded_amount
+        $sale->refunded_amount = $sale->total_amount;
+        $sale->total_amount = 0;
+        $sale->status = 'refunded';  // You may want to set the status to 'refunded' or similar
+        $sale->save();
+
+        // Loop through sale details to return products to inventory
+        foreach ($sale->saleDetails as $saleDetail) {
+            $product = $saleDetail->product;
+            $product->inventory->increment('quantity', $saleDetail->quantity); // Return quantity to inventory
+        }
+
+        return redirect()->back()->with('success', 'Sale successfully refunded.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Sale $sale)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Sale $sale)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
