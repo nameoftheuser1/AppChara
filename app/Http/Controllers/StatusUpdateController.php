@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderCancelled;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\Notifications\ReservationStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class StatusUpdateController extends Controller
 {
@@ -104,6 +106,10 @@ class StatusUpdateController extends Controller
 
         $order->status = 'cancelled';
         $order->save();
+
+        $ownerEmail = DB::table('settings')->where('key', 'email')->value('value') ?? 'appchara12@gmail.com';
+
+        Mail::to($ownerEmail)->send(new OrderCancelled($order));
 
         return redirect()->route('check.status.form')->with('success', 'Order has been cancelled successfully.');
     }
