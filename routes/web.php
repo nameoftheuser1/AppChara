@@ -66,3 +66,7 @@ Route::middleware('auth')->group(function () {
     Route::get('products/{product}/inventory/edit', [InventoryController::class, 'edit'])->name('inventories.edit');
     Route::put('/products/{product}/inventory', [InventoryController::class, 'update'])->name('inventories.update');
 });
+
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});

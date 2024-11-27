@@ -20,8 +20,7 @@ class ProductController extends Controller
 
         // Search by name or description
         if ($request->has('search') && $request->search !== null) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('description', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         // Filter by stock status
