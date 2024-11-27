@@ -54,15 +54,39 @@ class SaleController extends Controller
      */
     public function create()
     {
-        //
+        $sales = Sale::select('sale_date', 'total_amount')
+            ->orderBy('sale_date', 'desc')
+            ->paginate(10);
+
+        return view('sales.create', compact('sales'));
     }
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        // Validate incoming data
+        $validatedData = $request->validate([
+            'sale_date' => ['required', 'date'],
+            'total_amount' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        try {
+            // Create a new sale record
+            Sale::create([
+                'sale_date' => $validatedData['sale_date'],
+                'amount_received'=> $validatedData['total_amount'],
+                'total_amount' => $validatedData['total_amount'],
+            ]);
+
+            // Redirect with success message
+            return redirect()->back()->with('success', 'Sale successfully recorded.');
+        } catch (\Exception $e) {
+            // Redirect back with error message if something goes wrong
+            return redirect()->back()->with('error', 'An error occurred while recording the sale. Please try again.');
+        }
     }
 
     /**

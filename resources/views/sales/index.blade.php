@@ -27,6 +27,18 @@
                     <span class="text-lg font-semibold text-gray-700">Sales List</span>
                 </div>
             </a>
+
+            <a href="{{ route('sales.create') }}"
+                class="block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span class="text-lg font-semibold text-gray-700">Add historical sales</span>
+                </div>
+            </a>
         </div>
     </div>
 </x-admin-layout>

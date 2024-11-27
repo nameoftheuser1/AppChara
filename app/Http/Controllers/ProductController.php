@@ -121,7 +121,22 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        $product->load(['inventory']);
+
+        $orderDetails = $product->orderDetails()
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->latest()
+            ->paginate(10, ['*'], 'orderDetailsPage');
+
+        $saleDetails = $product->saleDetails()
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->latest()
+            ->paginate(10, ['*'], 'saleDetailsPage');
+
+        $salesCount = $saleDetails->sum('quantity') + $orderDetails->sum('quantity');
+        $totalSalesAmount = $saleDetails->sum('amount') + $orderDetails->sum('amount');
+
+        return view('products.show', compact('product', 'salesCount', 'totalSalesAmount', 'orderDetails', 'saleDetails'));
     }
 
     /**
@@ -132,12 +147,7 @@ class ProductController extends Controller
         return view('products.edit', compact('product'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, Product $product)
     {
         // Validate the request inputs

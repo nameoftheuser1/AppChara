@@ -137,7 +137,7 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="p-4 md:ml-64">
+    <div class="sm:p-0 md:p-4 lg:p-6 md:ml-64 p-4">
         <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg">
             {{ $slot }}
         </div>

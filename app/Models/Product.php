@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -43,5 +44,21 @@ class Product extends Model
     public function inventory(): HasOne
     {
         return $this->hasOne(Inventory::class);
+    }
+
+    /**
+     * Get all order details associated with the product.
+     */
+    public function orderDetails(): HasMany
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
+    /**
+     * Get all sale details associated with the product.
+     */
+    public function saleDetails(): HasMany
+    {
+        return $this->hasMany(SaleDetail::class);
     }
 }
