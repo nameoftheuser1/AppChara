@@ -84,7 +84,6 @@
                                 <label class="block text-sm text-gray-600 mb-2">Amount Received</label>
                                 <input type="number" id="amountReceived" name="amount_received" step="0.01" required
                                     class="w-full rounded border border-gray-300 px-3 py-2" min="{{ $total }}">
-
                             </div>
                             {{-- Change Display --}}
                             <div class="flex justify-between mb-4">

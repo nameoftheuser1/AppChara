@@ -47,8 +47,8 @@
             </div>
             @if ($sale->discount > 0)
                 <div class="flex justify-between text-sm text-gray-600">
-                    <span>Discount ({{ $sale->discount }}%):</span>
-                    <span>-₱{{ number_format($sale->subtotal * ($sale->discount / 100), 2) }}</span>
+                    <span>Discount :</span>
+                    <span>-₱{{ number_format($sale->discount )}}</span>
                 </div>
             @endif
             <div class="flex justify-between font-bold border-t border-gray-200 pt-2">

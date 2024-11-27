@@ -51,13 +51,18 @@ class StatusUpdateController extends Controller
             // Update the order status to completed
             $order->update(['status' => 'completed']);
 
-            // Loop through the order details to deduct quantities from inventory
+            // Loop through the order details to check inventory and deduct quantities
             foreach ($order->orderDetails as $orderDetail) {
                 // Get the product related to the order detail
                 $product = $orderDetail->product;
 
                 // Check if the product has an inventory record
                 if ($product->inventory) {
+                    // Check if there is enough stock to fulfill the order
+                    if ($product->inventory->quantity < $orderDetail->quantity) {
+                        throw new \Exception("Not enough stock for product: {$product->name}. Required: {$orderDetail->quantity}, Available: {$product->inventory->quantity}");
+                    }
+
                     // Subtract the quantity from the inventory
                     $product->inventory->decrement('quantity', $orderDetail->quantity);
                 } else {
@@ -66,7 +71,7 @@ class StatusUpdateController extends Controller
                 }
             }
 
-            // Commit the transaction
+            // Commit the transaction if no errors occurred
             DB::commit();
 
             // Find the reservation linked to the order
@@ -77,10 +82,8 @@ class StatusUpdateController extends Controller
 
             return redirect()->back()->with('success', 'Order has been moved to completed and inventory updated.');
         } catch (\Exception $e) {
-            // Rollback the transaction in case of an error
             DB::rollBack();
 
-            // Return with error message
             return redirect()->back()->with('error', 'Error updating order: ' . $e->getMessage());
         }
     }

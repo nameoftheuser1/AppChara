@@ -217,9 +217,8 @@
                 const productId = $(this).data('product-id');
                 const $input = $(`#quantity-${productId}`);
                 const currentVal = parseInt($input.val()) || 0;
-                const max = parseInt($input.attr('max'));
 
-                if ($(this).hasClass('plus') && currentVal < max) {
+                if ($(this).hasClass('plus')) {
                     $input.val(currentVal + 1);
                 } else if ($(this).hasClass('minus') && currentVal > 0) {
                     $input.val(currentVal - 1);

@@ -39,7 +39,7 @@ class PosController extends Controller
         });
 
         $discount = session('discount', 0);
-        $total = $subtotal * (1 - ($discount / 100));
+        $total = $subtotal - $discount;
 
         return view('pos.index', compact('products', 'cart_items', 'subtotal', 'total', 'discount'));
     }
@@ -52,9 +52,11 @@ class PosController extends Controller
         ]);
 
         $product = Product::findOrFail($request->product_id);
-
         // Find or create the current session's cart
-        $cart = Cart::firstOrCreate(['session_id' => session()->getId()]);
+        $cart = Cart::firstOrCreate(
+            ['session_id' => session()->getId()],
+            ['user_id' => Auth::id()]
+        );
 
         // Check if the product already exists in the cart
         $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
@@ -113,23 +115,30 @@ class PosController extends Controller
             'discount' => 'required|numeric|min:0', // Accept decimal values
         ]);
 
-        // Get the current total from the session or compute it if needed
-        $total = session('total', 0);  // Replace with your actual total calculation if needed
+        // Retrieve the user's cart
+        $cart = Cart::where('user_id', Auth::id())->with('cartItems')->first();
 
-        // Get the discount amount from the input
+        if (!$cart || $cart->cartItems->isEmpty()) {
+            return back()->with('error', 'Your cart is empty. Please add items before applying a discount.');
+        }
+        // Calculate the total amount from the cart items
+        $total = $cart->cartItems->sum(function ($item) {
+            return $item->price * $item->quantity;
+        });
+
         $discount = $request->discount;
+
+        if ($discount > $total) {
+            return back()->with('error', 'Discount cannot exceed the total amount.');
+        }
 
         // Calculate the total after applying the discount
         $totalAfterDiscount = $total - $discount;
 
-        // Ensure that the total is not negative
-        $totalAfterDiscount = max($totalAfterDiscount, 0);
-
         // Store the updated total and discount in the session
-        session(['total' => $totalAfterDiscount]);
-        session(['discount' => $discount]);
+        session(['total' => $totalAfterDiscount, 'discount' => $discount]);
 
-        return back()->with('success', 'Discount applied successfully');
+        return back()->with('success', 'Discount applied successfully.');
     }
 
     public function checkout(Request $request)
@@ -153,7 +162,7 @@ class PosController extends Controller
         });
 
         $discount = session('discount', 0);
-        $total = $subtotal * (1 - ($discount / 100));
+        $total = $subtotal - $discount;
 
         if ($request->amount_received < $total) {
             return back()->with('error', 'Insufficient payment amount');

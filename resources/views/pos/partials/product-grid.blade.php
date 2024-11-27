@@ -2,7 +2,7 @@
     <div class="grid grid-cols-3 gap-4">
         @forelse ($products as $product)
             <div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                onclick="openQuantityModal({{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, {{ $product->inventory_count }})">
+                onclick="openQuantityModal({{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, {{ $product->inventory->quantity }})">
                 @if ($product->img_path)
                     <img src="{{ asset($product->img_path) }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
                 @else
