@@ -86,6 +86,12 @@
         <!-- Include existing scripts -->
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+        @php
+            // Ensure $categories is not empty and calculate the index safely
+            $predictionStartIndex = max(0, count($categories) - 3);
+            $predictionCategory = !empty($categories) ? $categories[$predictionStartIndex] : null;
+        @endphp
+
         <script>
             var options = {
                 chart: {
@@ -94,14 +100,16 @@
                 },
                 series: [{
                     name: 'Sales',
-                    data: @json($data)
+                    data: @json($data).map(function(value) {
+                        return value.toFixed(2);
+                    }) // Round data to 2 decimals
                 }],
                 xaxis: {
                     categories: @json($categories)
                 },
                 annotations: {
                     xaxis: [{
-                        x: @json($categories[count($categories) - 3]), // Get the start of prediction point
+                        x: @json($predictionCategory),
                         strokeDashArray: 0,
                         borderColor: '#775DD0',
                         label: {
@@ -117,6 +125,13 @@
                 stroke: {
                     curve: 'smooth',
                     dashArray: [0, 5] // Solid line for actual data, dashed for prediction
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return parseFloat(val).toFixed(2); // Round tooltip to 2 decimals
+                        }
+                    }
                 }
             };
 
@@ -130,7 +145,9 @@
                 },
                 series: [{
                     name: 'Total Quantity',
-                    data: @json($fastMovingProducts->pluck('total_quantity')->toArray())
+                    data: @json($fastMovingProducts->pluck('total_quantity')->toArray()).map(function(value) {
+                        return value.toFixed(2);
+                    })
                 }],
                 xaxis: {
                     categories: @json($fastMovingProducts->pluck('name')->toArray()),
@@ -163,7 +180,7 @@
                 tooltip: {
                     y: {
                         formatter: function(val) {
-                            return val;
+                            return parseFloat(val).toFixed(2);
                         }
                     }
                 },

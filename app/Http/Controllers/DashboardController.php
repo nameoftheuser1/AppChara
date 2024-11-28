@@ -69,17 +69,25 @@ class DashboardController extends Controller
             return $this->simpleFallbackPrediction($historicalData);
         }
 
+        // If there's not enough data for regression, fall back
+        if ($historicalData->count() < 2) {
+            return $this->simpleFallbackPrediction($historicalData);
+        }
+
         // Prepare data for regression
         $samples = [];
         $targets = [];
 
         $historicalData->each(function ($item, $index) use (&$samples, &$targets) {
-            // Use index as feature
             $samples[] = [$index + 1];
             $targets[] = (float)$item->total_amount;
         });
 
         try {
+            // Ensure no NaN values in data
+            $samples = array_filter($samples, fn($sample) => !is_nan($sample[0]));
+            $targets = array_filter($targets, fn($target) => !is_nan($target));
+
             // Create and train the regression model
             $regression = new LeastSquares();
             $regression->train($samples, $targets);
@@ -113,11 +121,19 @@ class DashboardController extends Controller
 
     private function simpleFallbackPrediction($historicalData)
     {
-        $averageAmount = $historicalData->isEmpty()
-            ? 0
-            : $historicalData->avg('total_amount');
+        // Check if the collection is empty before trying to calculate the average
+        if ($historicalData->isEmpty()) {
+            return collect([]); // If empty, return an empty collection
+        }
 
-        $lastDate = Carbon::parse($historicalData->last()->date);
+        // Calculate the average total amount
+        $averageAmount = $historicalData->avg('total_amount');
+
+        // Get the last record's date
+        $lastItem = $historicalData->last();
+        $lastDate = Carbon::parse($lastItem->date);
+
+        // Initialize predictions array
         $predictions = [];
 
         for ($i = 1; $i <= 90; $i++) {
