@@ -12,6 +12,7 @@
         "php": "^8.2",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
+        "nesbot/carbon": "^3.8",
         "php-ai/php-ml": "^0.10.0"
     },
     "require-dev": {
