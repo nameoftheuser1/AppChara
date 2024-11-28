@@ -17,7 +17,6 @@ class DashboardController extends Controller
     {
         // Fetch historical data for the last 5 months
         $historicalData = $this->getHistoricalData();
-        $monthlyHistoricalData = $this->getHistoricalData(true);
 
         // Predict the next three months
         $predictions = $this->predictNextThreeMonths($historicalData);
@@ -35,16 +34,16 @@ class DashboardController extends Controller
         // Pass the prepared data to the view
         return view('dashboard.index', [
             'historicalData' => $historicalData,
-            '$monthlyHistoricalData' => $$monthlyHistoricalData,
             'categories' => $categories,
             'data' => $data,
             'fastMovingProducts' => $fastMovingProducts,
         ]);
     }
 
-    private function getHistoricalData($aggregateByMonth = false)
+    private function getHistoricalData()
     {
-        $query = DB::table('sales')
+        // Fetch daily sales and orders data
+        return DB::table('sales')
             ->selectRaw('
             DATE(sale_date) as date,
             YEAR(sale_date) as year,
@@ -52,25 +51,15 @@ class DashboardController extends Controller
             DAY(sale_date) as day,
             SUM(sales.total_amount) as total_sale_amount,
             COALESCE(SUM(orders.total_amount), 0) as total_order_amount,
-            (SUM(sales.total_amount) + COALESCE(SUM(orders.total_amount), 0)) as total_amount')
+            (SUM(sales.total_amount) + COALESCE(SUM(orders.total_amount), 0)) as total_amount') // Combined total amount
             ->leftJoin('orders', function ($join) {
                 $join->on(DB::raw('DATE(orders.created_at)'), '=', DB::raw('DATE(sales.sale_date)'))
                     ->where('orders.status', 'completed');
             })
-            ->whereRaw('sale_date >= DATE_SUB(CURDATE(), INTERVAL 150 DAY)');
-
-        if ($aggregateByMonth) {
-            $query->groupBy('year', 'month')
-                ->selectRaw('
-                  SUM(sales.total_amount) as total_sale_amount,
-                  COALESCE(SUM(orders.total_amount), 0) as total_order_amount,
-                  (SUM(sales.total_amount) + COALESCE(SUM(orders.total_amount), 0)) as total_amount
-              ');
-        } else {
-            $query->groupBy('date', 'year', 'month', 'day');
-        }
-
-        return $query->orderBy('date')->get();
+            ->whereRaw('sale_date >= DATE_SUB(CURDATE(), INTERVAL 150 DAY)') // Extended historical data range
+            ->groupBy('date', 'year', 'month', 'day')
+            ->orderBy('date')
+            ->get();
     }
 
     private function predictNextThreeMonths($historicalData)
