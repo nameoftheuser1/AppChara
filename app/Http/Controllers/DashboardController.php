@@ -137,21 +137,28 @@ class DashboardController extends Controller
 
     private function prepareChartData($historicalData, $predictions)
     {
-        $chartData = $historicalData->map(function ($item) {
+        // Aggregate historical data by month
+        $chartData = $historicalData->groupBy(function ($item) {
+            return sprintf('%s-%02d', $item->year, $item->month);
+        })->map(function ($monthData) {
             return [
-                'month' => sprintf('%s-%02d', $item->year, $item->month),
-                'total_amount' => $item->total_amount,
+                'month' => $monthData->first()->year . '-' . sprintf('%02d', $monthData->first()->month),
+                'total_amount' => $monthData->sum('total_amount'),
             ];
         });
 
-        $predictedData = $predictions->map(function ($item) {
+        // Aggregate predicted data by month
+        $predictedData = $predictions->groupBy(function ($item) {
+            return sprintf('%s-%02d', $item['year'], $item['month']);
+        })->map(function ($monthData) {
             return [
-                'month' => sprintf('%s-%02d', $item['year'], $item['month']),
-                'total_amount' => $item['total_amount'],
+                'month' => $monthData[0]['year'] . '-' . sprintf('%02d', $monthData[0]['month']),
+                'total_amount' => $monthData->sum('total_amount'),
             ];
         });
 
-        return $chartData->merge($predictedData);
+        // Merge and sort the data
+        return $chartData->merge($predictedData)->sortKeys();
     }
 
     private function getFastMovingProducts()
