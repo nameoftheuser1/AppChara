@@ -45,19 +45,19 @@ class DashboardController extends Controller
         // Fetch daily sales and orders data
         return DB::table('sales')
             ->selectRaw('
-                DATE(sale_date) as date,
-                YEAR(sale_date) as year,
-                MONTH(sale_date) as month,
-                DAY(sale_date) as day,
-                SUM(sales.total_amount) as total_sale_amount,
-                COALESCE(SUM(orders.total_amount), 0) as total_order_amount,
-                (SUM(sales.total_amount) + COALESCE(SUM(orders.total_amount), 0)) as total_amount') // Combined total amount
+            DATE(sale_date) as date,
+            YEAR(sale_date) as year,
+            MONTH(sale_date) as month,
+            DAY(sale_date) as day,
+            SUM(sales.total_amount) as total_sale_amount,
+            COALESCE(SUM(orders.total_amount), 0) as total_order_amount,
+            (SUM(sales.total_amount) + COALESCE(SUM(orders.total_amount), 0)) as total_amount') // Combined total amount
             ->leftJoin('orders', function ($join) {
                 $join->on(DB::raw('DATE(orders.created_at)'), '=', DB::raw('DATE(sales.sale_date)'))
                     ->where('orders.status', 'completed');
             })
             ->whereRaw('sale_date >= DATE_SUB(CURDATE(), INTERVAL 150 DAY)') // Extended historical data range
-            ->groupBy(DB::raw('DATE(sale_date)'))
+            ->groupBy('date', 'year', 'month', 'day')
             ->orderBy('date')
             ->get();
     }
