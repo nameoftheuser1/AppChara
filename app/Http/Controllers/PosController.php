@@ -44,45 +44,60 @@ class PosController extends Controller
         return view('pos.index', compact('products', 'cart_items', 'subtotal', 'total', 'discount'));
     }
 
+    use Illuminate\Support\Facades\DB;
+
     public function addItem(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
-        ]);
+        DB::beginTransaction(); // Start the transaction
 
-        $product = Product::findOrFail($request->product_id);
-        // Find or create the current session's cart
-        $cart = Cart::firstOrCreate(
-            ['session_id' => session()->getId()],
-            ['user_id' => Auth::id()]
-        );
-
-        // Check if the product already exists in the cart
-        $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
-
-        $currentCartQuantity = $cartItem ? $cartItem->quantity : 0;
-        $newTotalQuantity = $currentCartQuantity + $request->quantity;
-
-        // Check if sufficient stock is available
-        if ($product->inventory->quantity < $newTotalQuantity) {
-            return back()->with('error', 'Insufficient stock');
-        }
-
-        if ($cartItem) {
-            // Update the quantity if the product is already in the cart
-            $cartItem->update(['quantity' => $newTotalQuantity]);
-        } else {
-            // Add a new cart item if it doesn't exist
-            CartItem::create([
-                'cart_id' => $cart->id,
-                'product_id' => $product->id,
-                'quantity' => $request->quantity,
-                'price' => $product->price
+        try {
+            $request->validate([
+                'product_id' => 'required|exists:products,id',
+                'quantity' => 'required|integer|min:1'
             ]);
-        }
 
-        return back()->with('success', 'Item added to cart');
+            $product = Product::findOrFail($request->product_id);
+            // Find or create the current session's cart
+            $cart = Cart::firstOrCreate(
+                ['session_id' => session()->getId()],
+                ['user_id' => Auth::id()]
+            );
+
+            // Check if the product already exists in the cart
+            $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
+
+            $currentCartQuantity = $cartItem ? $cartItem->quantity : 0;
+            $newTotalQuantity = $currentCartQuantity + $request->quantity;
+
+            // Check if sufficient stock is available
+            if ($product->inventory->quantity < $newTotalQuantity) {
+                return back()->with('error', 'Insufficient stock');
+            }
+
+            if ($cartItem) {
+                // Update the quantity if the product is already in the cart
+                $cartItem->update(['quantity' => $newTotalQuantity]);
+            } else {
+                // Add a new cart item if it doesn't exist
+                CartItem::create([
+                    'cart_id' => $cart->id,
+                    'product_id' => $product->id,
+                    'quantity' => $request->quantity,
+                    'price' => $product->price
+                ]);
+            }
+
+            // Commit the transaction if everything is successful
+            DB::commit();
+
+            return back()->with('success', 'Item added to cart');
+        } catch (\Exception $e) {
+            // Rollback the transaction if something goes wrong
+            DB::rollBack();
+
+            // Return with error message
+            return back()->with('error', 'An error occurred. Please try again.');
+        }
     }
 
     public function removeItem(Request $request)

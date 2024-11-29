@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reservations/complete', [ReservationController::class, 'completeIndex'])->name('reservations.complete');
     Route::get('/reservations/all', [ReservationController::class, 'allIndex'])->name('reservations.all');
     Route::get('/reservations/cancel', [ReservationController::class, 'cancelIndex'])->name('reservations.cancel');
+    Route::get('/reservations/refunded', [ReservationController::class, 'refundedIndex'])->name('reservations.refunded');
 
 
     Route::get('/orders/{order}/reservation', [ReservationController::class, 'showReservation']);

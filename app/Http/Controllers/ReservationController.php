@@ -10,6 +10,7 @@ use App\Models\Reservation;
 use App\Models\Product;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class ReservationController extends Controller
@@ -29,6 +30,7 @@ class ReservationController extends Controller
             'ready_to_pickup' => Order::where('status', 'ready to pickup')->count(),
             'completed' => Order::where('status', 'completed')->count(),
             'cancelled' => Order::where('status', 'cancelled')->count(),
+            'refunded' => Order::where('status', 'refunded')->count(), // Added refunded count
             'total' => Order::count(),
         ];
 
@@ -46,7 +48,10 @@ class ReservationController extends Controller
             'completed' => Order::where('status', 'completed')
                 ->where('updated_at', '>=', $fourHoursAgo)
                 ->count(),
-            'cancelled' => Order::where('status', 'cancelled') // Added cancelled recent updates
+            'cancelled' => Order::where('status', 'cancelled')
+                ->where('updated_at', '>=', $fourHoursAgo)
+                ->count(),
+            'refunded' => Order::where('status', 'refunded') // Added refunded recent updates
                 ->where('updated_at', '>=', $fourHoursAgo)
                 ->count(),
         ];
@@ -80,6 +85,17 @@ class ReservationController extends Controller
             'cancelledOrders' => $cancelledOrders
         ]);
     }
+
+    public function refundedIndex(Request $request)
+    {
+        $refundedOrders = Order::where('status', 'refunded')
+            ->latest()
+            ->paginate(10);
+        return view('reservations.refunded-index', [
+            'refundedOrders' => $refundedOrders
+        ]);
+    }
+
 
     public function processingIndex(Request $request)
     {
@@ -163,72 +179,83 @@ class ReservationController extends Controller
 
     public function reservationStore(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'contact_number' => ['required', 'string', 'regex:/^\d{11}$/'],
-            'email' => 'required|email|max:255',
-            'coupon' => 'nullable|string|max:50',
-            'pick_up_date' => 'required|date|after_or_equal:' . now()->toDateString(),
-            'products' => 'required|array',
-            'products.*' => 'integer|min:0',
-        ]);
+        DB::beginTransaction(); // Start the transaction
 
-        // Remove products with zero quantity
-        $products = array_filter($validated['products'], fn($quantity) => $quantity > 0);
-
-        if (empty($products)) {
-            return redirect()->back()->withErrors(['products' => 'At least one product must have a quantity greater than zero.']);
-        }
-
-        // Generate a transaction key
-        $transactionKey = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 6));
-
-        // Create a new order
-        $order = Order::create([
-            'transaction_key' => $transactionKey,
-            'total_amount' => 0,
-            'status' => Order::STATUS_PENDING,
-        ]);
-
-        // Calculate total amount and attach products to order
-        $totalAmount = 0;
-        foreach ($products as $productId => $quantity) {
-            $product = Product::findOrFail($productId);
-
-            OrderDetail::create([
-                'order_id' => $order->id,
-                'product_id' => $productId,
-                'quantity' => $quantity,
-                'amount' => $product->price * $quantity,
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:100',
+                'contact_number' => ['required', 'string', 'regex:/^\d{11}$/'],
+                'email' => 'required|email|max:255',
+                'coupon' => 'nullable|string|max:50',
+                'pick_up_date' => 'required|date|after_or_equal:' . now()->toDateString(),
+                'products' => 'required|array',
+                'products.*' => 'integer|min:0',
             ]);
 
-            $totalAmount += $product->price * $quantity;
+            // Remove products with zero quantity
+            $products = array_filter($validated['products'], fn($quantity) => $quantity > 0);
+
+            if (empty($products)) {
+                return redirect()->back()->withErrors(['products' => 'At least one product must have a quantity greater than zero.']);
+            }
+
+            // Generate a transaction key
+            $transactionKey = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 6));
+
+            // Create a new order
+            $order = Order::create([
+                'transaction_key' => $transactionKey,
+                'total_amount' => 0,
+                'status' => Order::STATUS_PENDING,
+            ]);
+
+            // Calculate total amount and attach products to order
+            $totalAmount = 0;
+            foreach ($products as $productId => $quantity) {
+                $product = Product::findOrFail($productId);
+
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'amount' => $product->price * $quantity,
+                ]);
+
+                $totalAmount += $product->price * $quantity;
+            }
+
+            // Update total amount in the order
+            $order->update(['total_amount' => $totalAmount]);
+
+            // Create a reservation linked to the order
+            $reservation = Reservation::create([
+                'transaction_key' => $transactionKey,
+                'name' => $validated['name'],
+                'contact_number' => $validated['contact_number'],
+                'email' => $validated['email'],
+                'coupon' => $validated['coupon'] ?? null,
+                'pick_up_date' => $validated['pick_up_date'],
+                'order_id' => $order->id,
+            ]);
+
+            // Send confirmation email to the user
+            Mail::to($validated['email'])->send(new ReservationConfirmationToUser($transactionKey, $validated['pick_up_date']));
+
+            $clientEmail = Setting::where('key', 'email')->value('value') ?? 'appchara12@gmail.com';
+            Mail::to($clientEmail)->send(new NewReservationToClient($transactionKey, $validated['name'], $validated['pick_up_date'], $validated['contact_number'], $validated['email']));
+
+            DB::commit(); // Commit the transaction if everything is successful
+
+            // Redirect to the check status form with the transaction key
+            return redirect()->route('check.status.form')->with([
+                'transaction_key' => $transactionKey,
+                'success' => 'Reservation created successfully! You can check your status using the transaction key.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback the transaction if something goes wrong
+
+            // Return an error message
+            return redirect()->back()->withErrors(['error' => 'An error occurred. Please try again later.']);
         }
-
-        // Update total amount in the order
-        $order->update(['total_amount' => $totalAmount]);
-
-        // Create a reservation linked to the order
-        $reservation = Reservation::create([
-            'transaction_key' => $transactionKey,
-            'name' => $validated['name'],
-            'contact_number' => $validated['contact_number'],
-            'email' => $validated['email'],
-            'coupon' => $validated['coupon'] ?? null,
-            'pick_up_date' => $validated['pick_up_date'],
-            'order_id' => $order->id,
-        ]);
-
-        // Send confirmation email to the user
-        Mail::to($validated['email'])->send(new ReservationConfirmationToUser($transactionKey, $validated['pick_up_date']));
-
-        $clientEmail = Setting::where('key', 'email')->value('value') ?? 'appchara12@gmail.com';
-        Mail::to($clientEmail)->send(new NewReservationToClient($transactionKey, $validated['name'], $validated['pick_up_date'], $validated['contact_number'], $validated['email']));
-
-        // Redirect to the check status form with the transaction key
-        return redirect()->route('check.status.form')->with([
-            'transaction_key' => $transactionKey,
-            'success' => 'Reservation created successfully! You can check your status using the transaction key.',
-        ]);
     }
 }

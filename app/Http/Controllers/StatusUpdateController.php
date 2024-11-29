@@ -116,35 +116,49 @@ class StatusUpdateController extends Controller
 
     public function refund($id)
     {
-        $order = Order::findOrFail($id);
+        DB::beginTransaction(); // Start the transaction
 
-        // Calculate the refunded amount (sum of all order details amounts)
-        $refundedAmount = 0;
-        foreach ($order->orderDetails as $detail) {
-            $inventory = Inventory::where('product_id', $detail->product_id)->first();
-            if ($inventory) {
-                $inventory->quantity += $detail->quantity;
-                $inventory->save();
+        try {
+            $order = Order::findOrFail($id);
+
+            // Set refunded amount to the total amount of the order
+            $refundedAmount = $order->total_amount;
+
+            // Update the refunded amount and status in the reservation
+            if ($order->reservation) {
+                $order->reservation->update([
+                    'status' => 'refunded',
+                    'refunded_amount' => $refundedAmount,
+                ]);
+
+                // Notify the reservation status update
+                $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
             }
-            $refundedAmount += $detail->quantity * $detail->price;
-        }
 
-        if ($order->reservation) {
-            // Update the refunded amount in the reservation
-            $order->reservation->update([
+            // Update the inventory for each product in the order
+            foreach ($order->orderDetails as $detail) {
+                $inventory = Inventory::where('product_id', $detail->product_id)->first();
+                if ($inventory) {
+                    $inventory->quantity += $detail->quantity; // Add the refunded quantity back to inventory
+                    $inventory->save();
+                } else {
+                    throw new \Exception("Inventory not found for product ID {$detail->product_id}");
+                }
+            }
+
+            // Set the order status to refunded and total amount to 0
+            $order->update([
                 'status' => 'refunded',
-                'refunded_amount' => $refundedAmount,
+                'total_amount' => 0,
             ]);
 
-            // Notify the reservation status update
-            $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
+            DB::commit(); // Commit the transaction if everything is successful
+
+            return redirect()->route('reservations.complete')->with('success', 'Order refunded successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback the transaction if something goes wrong
+
+            return redirect()->route('reservations.complete')->with('error', 'Refund failed: ' . $e->getMessage());
         }
-
-        $order->update([
-            'status' => 'refunded',
-            'total_amount' => 0,
-        ]);
-
-        return redirect()->route('reservations.complete')->with('success', 'Order refunded successfully.');
     }
 }
