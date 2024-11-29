@@ -64,10 +64,11 @@
             <div class="bg-white rounded-lg p-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">5-Month Combined Sales & Orders</h3>
                 <div class="space-y-4">
-                    @foreach ($historicalData as $monthData)
+                    @foreach ($groupedData as $monthData)
                         <div class="flex justify-between items-center border-b py-2">
-                            <span
-                                class="text-gray-600">{{ \Carbon\Carbon::createFromFormat('Y-m', "{$monthData->year}-{$monthData->month}")->format('F Y') }}</span>
+                            <span class="text-gray-600">
+                                {{ \Carbon\Carbon::createFromFormat('Y-m', "{$monthData->year}-{$monthData->month}")->format('F Y') }}
+                            </span>
                             <div class="flex items-center">
                                 <span class="mr-4 text-gray-500">Total Amount: </span>
                                 <span
@@ -146,7 +147,7 @@
                 series: [{
                     name: 'Total Quantity',
                     data: @json($fastMovingProducts->pluck('total_quantity')->toArray()).map(function(value) {
-                        return value.toFixed(2);
+                        return value;
                     })
                 }],
                 xaxis: {
@@ -180,7 +181,7 @@
                 tooltip: {
                     y: {
                         formatter: function(val) {
-                            return parseFloat(val).toFixed(2);
+                            return parseFloat(val);
                         }
                     }
                 },

@@ -18,6 +18,22 @@ class DashboardController extends Controller
         // Fetch historical data for the last 5 months
         $historicalData = $this->getHistoricalData();
 
+        // Group data by year and month and sum the total_amount
+        $groupedData = collect($historicalData)
+            ->groupBy(function ($item) {
+                return $item->year . '-' . $item->month; // Group by year and month
+            })
+            ->map(function ($items, $key) {
+                $totalAmount = $items->sum('total_amount'); // Sum total_amount for the group
+                $firstItem = $items->first(); // Use the first item for metadata
+                return (object) [
+                    'year' => $firstItem->year,
+                    'month' => $firstItem->month,
+                    'total_amount' => $totalAmount,
+                ];
+            })->values(); // Reset the keys
+
+
         // Predict the next three months
         $predictions = $this->predictNextThreeMonths($historicalData);
 
@@ -33,6 +49,7 @@ class DashboardController extends Controller
 
         // Pass the prepared data to the view
         return view('dashboard.index', [
+            'groupedData' => $groupedData,
             'historicalData' => $historicalData,
             'categories' => $categories,
             'data' => $data,
