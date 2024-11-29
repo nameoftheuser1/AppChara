@@ -118,21 +118,32 @@ class StatusUpdateController extends Controller
     {
         $order = Order::findOrFail($id);
 
-        // Ensure the `products` relationship exists
+        // Calculate the refunded amount (sum of all order details amounts)
+        $refundedAmount = 0;
         foreach ($order->orderDetails as $detail) {
             $inventory = Inventory::where('product_id', $detail->product_id)->first();
             if ($inventory) {
                 $inventory->quantity += $detail->quantity;
                 $inventory->save();
             }
+            $refundedAmount += $detail->quantity * $detail->price;
         }
 
         if ($order->reservation) {
-            $order->reservation->update(['status' => 'refunded']);
+            // Update the refunded amount in the reservation
+            $order->reservation->update([
+                'status' => 'refunded',
+                'refunded_amount' => $refundedAmount,
+            ]);
+
+            // Notify the reservation status update
             $order->reservation->notify(new ReservationStatusUpdated($order->reservation));
         }
 
-        $order->update(['status' => 'refunded']);
+        $order->update([
+            'status' => 'refunded',
+            'total_amount' => 0,
+        ]);
 
         return redirect()->route('reservations.complete')->with('success', 'Order refunded successfully.');
     }

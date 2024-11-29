@@ -8,6 +8,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReservationPosController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StatusUpdateController;
@@ -29,6 +30,8 @@ Route::middleware('guest')->group(function () {
 
 // Protected routes for authenticated users
 Route::middleware('auth')->group(function () {
+
+    Route::get('/reservation-sales', [ReservationPosController::class, 'index'])->name('reservation-pos.sales');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

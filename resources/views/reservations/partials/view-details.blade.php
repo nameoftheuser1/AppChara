@@ -80,6 +80,11 @@
                         statusBadge = 'bg-gray-100 text-gray-800';
                 }
 
+                // Conditionally show refunded_amount if it exists
+                const refundedAmountHtml = reservation.refunded_amount ?
+                    `<p><span class="font-medium text-gray-600">Refunded Amount:</span> ₱${reservation.refunded_amount}</p>` :
+                    '';
+
                 document.getElementById('reservation-content').innerHTML = `
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-gray-50 p-4 rounded-lg">
@@ -101,6 +106,7 @@
                                     ${reservation.status.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                 </span>
                             </p>
+                            ${refundedAmountHtml} <!-- Display refunded amount if available -->
                         </div>
                     </div>
                 </div>

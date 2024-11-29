@@ -61,8 +61,10 @@
 
         <!-- Existing dashboard content -->
         <div class="max-h-56 h-2">
+            <div id="chart" class="mt-5 bg-white rounded-lg p-6 mb-5"></div>
+
             <div class="bg-white rounded-lg p-6">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">5-Month Combined Sales & Orders</h3>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">5-Month Sales </h3>
                 <div class="space-y-4">
                     @foreach ($groupedData as $monthData)
                         <div class="flex justify-between items-center border-b py-2">
@@ -80,7 +82,6 @@
             </div>
 
             <!-- Existing charts -->
-            <div id="chart" class="mt-5 bg-white rounded-lg p-6"></div>
             <div id="fastMovingProductsChart" class="mt-5 bg-white rounded-lg p-6"></div>
         </div>
 
