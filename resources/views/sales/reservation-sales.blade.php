@@ -78,8 +78,8 @@
 
         {{-- Pagination --}}
         <div class="mt-4 flex justify-between">
-            <div>{{ $orders->appends(request()->query())->links() }}</div>
-            <div>{{ $sales->appends(request()->query())->links() }}</div>
+            <x-pagination :paginator="$orders" />
+            <x-pagination :paginator="$sales" />
         </div>
 
     </div>
