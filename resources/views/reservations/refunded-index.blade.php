@@ -78,7 +78,9 @@
                 </table>
             </div>
 
-            <x-pagination :paginator="$refundedOrders" />
+            <div class="px-6 py-4 border-t border-gray-200">
+                {{ $refundedOrders->links() }}
+            </div>
         </div>
     </div>
 

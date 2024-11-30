@@ -8,8 +8,7 @@
             <div class="grid grid-cols-1">
                 {{-- Total Stock Value Card --}}
                 <div class="bg-white shadow-lg rounded-lg overflow-hidden w-full">
-                    <div
-                        class="bg-gradient-to-r from-yellow-400 to-green-500 p-4 flex items-center justify-between w-full">
+                    <div class="bg-gradient-to-r from-yellow-400 to-green-500 p-4 flex items-center justify-between w-full">
                         <div class="flex items-center space-x-4">
                             <div class="bg-white/25 p-3 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
@@ -87,8 +86,6 @@
                 </div>
             </div>
         </div>
-
-        <x-pagination :paginator="$stocks" />
 
     </div>
 

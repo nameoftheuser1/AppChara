@@ -119,7 +119,9 @@
         </form>
 
         {{-- Pagination --}}
-        <x-pagination :paginator="$products" />
+        <div class="mt-8">
+            {{ $products->links() }}
+        </div>
     </div>
 
     <script>

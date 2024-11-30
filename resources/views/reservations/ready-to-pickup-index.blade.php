@@ -104,7 +104,9 @@
                 </table>
             </div>
 
-            <x-pagination :paginator="$readyToPickUpOrders" />
+            <div class="px-6 py-4 border-t border-gray-200">
+                {{ $readyToPickUpOrders->links() }}
+            </div>
         </div>
     </div>
 

@@ -27,5 +27,7 @@
     </div>
 
     {{-- Pagination --}}
-    <x-pagination :paginator="$products" />
+    <div class="mt-6">
+        {{ $products->links() }}
+    </div>
 </div>
