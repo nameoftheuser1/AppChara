@@ -16,10 +16,6 @@
                         </svg>
                     </button>
 
-                    <div x-show="open" x-transition
-                        class="absolute z-10 w-full bg-white shadow-lg rounded-lg mt-1 overflow-hidden">
-                        @include('reservations.partials.navigation-links')
-                    </div>
                 </div>
 
                 {{-- Desktop View --}}
@@ -113,9 +109,7 @@
                 </table>
             </div>
 
-            <div class="px-6 py-4 border-t border-gray-200">
-                {{ $allOrders->links() }}
-            </div>
+            <x-pagination :paginator="$allOrders" />
         </div>
     </div>
 
