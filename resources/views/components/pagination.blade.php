@@ -1,4 +1,14 @@
 <!-- resources/views/components/pagination.blade.php -->
+@props(['paginator' => null])
+
+@php
+    if (!$paginator) {
+        return;
+    }
+
+    $elements = $paginator->elements();
+@endphp
+
 @if ($paginator->hasPages())
     <nav role="navigation" aria-label="{{ __('Pagination Navigation') }}" class="flex items-center justify-between py-4">
         <div class="flex flex-1 justify-between sm:hidden">
