@@ -44,8 +44,6 @@ class PosController extends Controller
         return view('pos.index', compact('products', 'cart_items', 'subtotal', 'total', 'discount'));
     }
 
-    use Illuminate\Support\Facades\DB;
-
     public function addItem(Request $request)
     {
         DB::beginTransaction(); // Start the transaction
