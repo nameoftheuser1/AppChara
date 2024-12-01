@@ -27,7 +27,9 @@ class SaleController extends Controller
             $salesQuery->whereMonth('sale_date', $month);
         }
 
-        $sales = $salesQuery->get();
+        // Use paginate with a desired items-per-page value
+        $sales = $salesQuery->paginate(10);
+
         return view('sales.sales', compact('sales'));
     }
 

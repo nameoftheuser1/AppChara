@@ -67,8 +67,7 @@
                                     class="inline-block">
                                     @csrf
                                     @method('POST')
-                                    <button type="submit"
-                                        class="text-red-600 hover:text-red-900 ml-4">
+                                    <button type="submit" class="text-red-600 hover:text-red-900 ml-4">
                                         Refund
                                     </button>
                                 </form>
@@ -77,6 +76,9 @@
                     @endforeach
                 </tbody>
             </table>
+            <div class="mt-4">
+                {{ $sales->links() }}
+            </div>
         </div>
 
         <!-- Sale Details Modal -->
@@ -118,8 +120,8 @@
                         <h4>Sale Details:</h4>
                         <ul>
                             ${data.sale_details.map(detail => `
-                                                                    <li>${detail.product.name} (₱${detail.product_price}) - Quantity: ${detail.quantity}</li>
-                                                                `).join('')}
+                                                                        <li>${detail.product.name} (₱${detail.product_price}) - Quantity: ${detail.quantity}</li>
+                                                                    `).join('')}
                         </ul>
                     `;
                     // Show modal
