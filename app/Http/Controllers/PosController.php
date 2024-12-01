@@ -17,6 +17,10 @@ class PosController extends Controller
 
     public function index(Request $request)
     {
+
+        $cutoffTime = now()->subHours(24);
+        Cart::where('created_at', '<', $cutoffTime)->delete();
+
         $query = Product::query();
 
         if ($request->has('search')) {
@@ -100,21 +104,24 @@ class PosController extends Controller
 
     public function removeItem(Request $request)
     {
-        // Validate the item_id
         $validated = $request->validate([
             'item_id' => ['required', 'integer', 'exists:cart_items,id'],
         ]);
 
-        // Find the cart item by item_id and session_id
         $cartItem = CartItem::where('id', $validated['item_id'])
             ->whereHas('cart', function ($query) {
                 $query->where('session_id', session()->getId());
             })
             ->first();
 
-        // If the cart item exists, delete it
         if ($cartItem) {
             $cartItem->delete();
+
+            $cart = $cartItem->cart;
+            if ($cart->cartItems()->count() === 0) {
+                $cart->delete();
+            }
+
             return back()->with('success', 'Item removed from cart');
         } else {
             return back()->with('error', 'Item not found in the cart');
@@ -125,15 +132,18 @@ class PosController extends Controller
     {
         // Validate the discount input as a numeric value
         $request->validate([
-            'discount' => 'required|numeric|min:0', // Accept decimal values
+            'discount' => 'required|numeric|min:0',
         ]);
 
-        // Retrieve the user's cart
-        $cart = Cart::where('user_id', Auth::id())->with('cartItems')->first();
+        // Retrieve the cart for the current session
+        $cart = Cart::where('session_id', session()->getId())
+            ->with('cartItems')
+            ->first();
 
         if (!$cart || $cart->cartItems->isEmpty()) {
             return back()->with('error', 'Your cart is empty. Please add items before applying a discount.');
         }
+
         // Calculate the total amount from the cart items
         $total = $cart->cartItems->sum(function ($item) {
             return $item->price * $item->quantity;
@@ -145,11 +155,8 @@ class PosController extends Controller
             return back()->with('error', 'Discount cannot exceed the total amount.');
         }
 
-        // Calculate the total after applying the discount
-        $totalAfterDiscount = $total - $discount;
-
         // Store the updated total and discount in the session
-        session(['total' => $totalAfterDiscount, 'discount' => $discount]);
+        session(['total' => $total - $discount, 'discount' => $discount]);
 
         return back()->with('success', 'Discount applied successfully.');
     }
