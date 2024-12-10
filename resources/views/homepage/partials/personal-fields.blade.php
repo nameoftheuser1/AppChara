@@ -28,8 +28,10 @@
         </div>
         <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-            <input type="email" id="email" name="email" value="{{ old('email') }}" required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 @error('email') border-red-500 @enderror">
+            <input type="email" id="email" name="email" value="{{ old('email') ?? Auth::user()->email }}"
+                required readonly
+                class="mt-1 block w-full rounded-md border-gray-300 bg-slate-400 shadow-sm cursor-not-allowed focus:border-green-500 focus:ring-green-500 @error('email') border-red-500 @enderror"
+                style="background-color: #94a3b8; color: white;">
             @error('email')
                 <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
             @enderror

@@ -20,7 +20,8 @@ class Reservation extends Model
         'pick_up_date',
         'order_id',
         'email',
-        'refunded_amount'
+        'refunded_amount',
+        'user_id',
     ];
 
     public function order(): BelongsTo

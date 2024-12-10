@@ -10,7 +10,7 @@
                     <div
                         class="absolute inset-0 bg-gradient-to-r from-green-900/70 to-yellow-900/70 flex items-center justify-center">
                         <div class="text-center text-white">
-                            <h2 class="text-4xl font-bold mb-4">AppChara</h2>
+                            <h2 class="text-4xl font-bold mb-4">Conchings's Atchara and Delicacies</h2>
                             <p class="text-xl">Add a Zing to Every Meal with Our Freshly Made Atchara!</p>
                         </div>
                     </div>
@@ -80,14 +80,14 @@
                         side dish that pairs perfectly with fried foods.</p>
                 </div>
             </div>
-            {{-- <div
+            <div
                 class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-green-100">
-                <img src="/api/placeholder/400/300" alt="Lomi" class="w-full h-48 object-cover">
+                <img src="{{ asset('img/ubod.jpg') }}" alt="Lomi" class="w-full h-48 object-cover">
                 <div class="p-6">
                     <h3 class="text-xl font-bold mb-2 text-green-800">Ubod</h3>
                     <p class="text-green-700">The edible pith derived from coconut trunks</p>
                 </div>
-            </div> --}}
+            </div>
 
             <!-- Additional food items with same styling -->
         </div>
@@ -98,20 +98,17 @@
         <div class="max-w-screen-xl mx-auto px-4">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h2 class="text-3xl font-bold mb-6 text-green-800">About Calaca City</h2>
+                    <h2 class="text-3xl font-bold mb-6 text-green-800">About Casiana Camson Villamar</h2>
                     <p class="text-green-700 mb-4">
-                        Calaca is a first-class municipality in the province of Batangas, Philippines. Known for its
-                        rich culinary heritage,
-                        the city offers various local delicacies that have been passed down through generations.
-                    </p>
-                    <p class="text-green-700">
-                        Our local food scene is a perfect blend of traditional Batangeño flavors and modern culinary
-                        techniques,
-                        making it a must-visit destination for food enthusiasts.
+                        Casiana Camson Villamar, born in 1936, was the founder of Conching's Atchara and Delicacies. She
+                        began her entrepreneurial journey at the age of 31, initially establishing the business in
+                        Poblacion 2. Later, it was relocated to Poblacion 5, where it continued to grow and serve the
+                        community. Casiana passed away on August 24, 2021, leaving behind a legacy of perseverance. She
+                        will always be remembered for her contribution and inspiration to many.
                     </p>
                 </div>
                 <div>
-                    <img src="{{ asset('img/calaca.webp') }}" alt="Calaca City" class="rounded-lg shadow-lg w-full">
+                    <img src="{{ asset('img/picture.jpg') }}" alt="Calaca City" class="rounded-lg shadow-lg w-full">
                 </div>
             </div>
         </div>

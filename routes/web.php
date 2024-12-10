@@ -7,32 +7,60 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationPosController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StatusUpdateController;
 use App\Notifications\ReservationStatusUpdated;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
-Route::get('/reservation-form', [ReservationController::class, 'reservationForm'])->name('reservation-form.form');
-Route::post('/reservation-form/store', [ReservationController::class, 'reservationStore'])->name('reservation-form.store');
+
 Route::get('/check-status', [HomeController::class, 'showCheckStatusForm'])->name('check.status.form');
 Route::post('/check-status', [HomeController::class, 'checkStatus'])->name('check.status');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect('/profile');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+
 // Public routes for guests only
 Route::middleware('guest')->group(function () {
-
     Route::view('/login', 'auth.login')->name('auth.login');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::delete('/order/{transaction_key}/cancel', [StatusUpdateController::class, 'cancelOrder'])->name('order.cancel');
+    Route::view('/register', 'auth.register')->name('auth.register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register');
 });
 
+Route::middleware(['auth', 'verified', 'role:user'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'indexProfile'])->name('profile');
+    Route::get('/reservation-form', [ReservationController::class, 'reservationForm'])->name('reservation-form.form');
+    Route::post('/reservation-form/store', [ReservationController::class, 'reservationStore'])->name('reservation-form.store');
+});
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 // Protected routes for authenticated users
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/reservation-sales', [ReservationPosController::class, 'index'])->name('reservation-pos.sales');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/admin/change-password', [SettingController::class, 'changePassword'])->name('admin.change-password');
@@ -74,6 +102,8 @@ Route::middleware('auth')->group(function () {
     Route::get('products/{product}/inventory/edit', [InventoryController::class, 'edit'])->name('inventories.edit');
     Route::put('/products/{product}/inventory', [InventoryController::class, 'update'])->name('inventories.update');
 });
+
+
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

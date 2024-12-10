@@ -35,17 +35,13 @@
                 </svg>
             </div>
 
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">404: Are You Lost?</h1>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">403: This is page is not for you!</h1>
             <p class="text-gray-600 mb-6">This page seems to have wandered off...</p>
 
 
             <a href="{{ route('home.index') }}"
                 class="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
                 Return Home
-            </a>
-            <a href="{{ route('login') }}"
-                class="ml-4 px-6 py-3 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition">
-                Login
             </a>
 
         </div>

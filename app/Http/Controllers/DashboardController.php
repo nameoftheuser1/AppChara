@@ -3,13 +3,9 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Phpml\Exception\InvalidArgumentException;
-use Phpml\FeatureExtraction\TokensFilter;
 use Phpml\Regression\LeastSquares;
-use Phpml\Regression\SVR;
-use Phpml\Regression\LassoRegression;
 
 class DashboardController extends Controller
 {
@@ -81,57 +77,50 @@ class DashboardController extends Controller
 
     private function predictNextThreeMonths($historicalData)
     {
-        // Validate and prepare data
-        if ($historicalData->isEmpty()) {
+        // Group historical data by month to smooth out daily fluctuations
+        $monthlyData = $historicalData->groupBy(function ($item) {
+            return $item->year . '-' . sprintf('%02d', $item->month);
+        })->map(function ($monthGroup) {
+            return [
+                'total_amount' => $monthGroup->sum('total_amount'),
+                'year' => $monthGroup->first()->year,
+                'month' => $monthGroup->first()->month
+            ];
+        })->values();
+
+        // If not enough monthly data, use fallback
+        if ($monthlyData->count() < 3) {
             return $this->simpleFallbackPrediction($historicalData);
         }
 
-        // If there's not enough data for regression, fall back
-        if ($historicalData->count() < 2) {
-            return $this->simpleFallbackPrediction($historicalData);
-        }
+        // Prepare monthly samples and targets
+        $samples = $monthlyData->map(function ($item, $index) {
+            return [$index + 1];
+        })->toArray();
 
-        // Prepare data for regression
-        $samples = [];
-        $targets = [];
-
-        $historicalData->each(function ($item, $index) use (&$samples, &$targets) {
-            $samples[] = [$index + 1];
-            $targets[] = (float)$item->total_amount;
-        });
+        $targets = $monthlyData->pluck('total_amount')->toArray();
 
         try {
-            // Ensure no NaN values in data
-            $samples = array_filter($samples, fn($sample) => !is_nan($sample[0]));
-            $targets = array_filter($targets, fn($target) => !is_nan($target));
-
-            // Create and train the regression model
             $regression = new LeastSquares();
             $regression->train($samples, $targets);
 
-            // Predict next 90 days
+            $lastMonthData = $monthlyData->last();
+            $lastDate = Carbon::create($lastMonthData['year'], $lastMonthData['month'], 1);
+
             $predictions = [];
-            $lastDate = Carbon::parse($historicalData->last()->date);
-
-            for ($i = 1; $i <= 90; $i++) {
-                $predictedDate = $lastDate->copy()->addDays($i);
-
-                // Predict using the next sequential index
-                $samplesCount = count($samples);
-                $predictedAmount = max(0, $regression->predict([$samplesCount + $i]));
+            for ($i = 1; $i <= 3; $i++) {
+                $predictedDate = $lastDate->copy()->addMonths($i);
+                $predictedAmount = max(0, $regression->predict([count($samples) + $i]));
 
                 $predictions[] = [
                     'year' => $predictedDate->year,
                     'month' => $predictedDate->month,
-                    'day' => $predictedDate->day,
-                    'date' => $predictedDate->toDateString(),
                     'total_amount' => $predictedAmount,
                 ];
             }
 
             return collect($predictions);
         } catch (InvalidArgumentException $e) {
-            // Fallback if regression fails
             return $this->simpleFallbackPrediction($historicalData);
         }
     }

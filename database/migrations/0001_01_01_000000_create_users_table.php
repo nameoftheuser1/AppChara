@@ -44,6 +44,7 @@ return new class extends Migration
             'email' => 'admin',
             'password' => Hash::make('admin'),
             'role' => 'admin',
+            'email_verified_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

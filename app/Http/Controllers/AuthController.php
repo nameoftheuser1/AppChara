@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,21 +26,50 @@ class AuthController extends Controller
         // Validate input
         $fields = $request->validate($rules);
 
-        // Check for admin login first (using manual hardcoded check)
+        // Attempt to log in
         if (Auth::attempt(['email' => $fields['email'], 'password' => $fields['password']], $request->remember)) {
-            return redirect()->intended('/dashboard');
-        }
+            $user = Auth::user();
 
-        // Now attempt regular user login using Laravel's Auth::attempt
-        if (Auth::attempt(['email' => $fields['email'], 'password' => $fields['password']], $request->remember)) {
-            // If login is successful, redirect to intended page
-            return redirect()->intended('/dashboard'); // You can adjust the redirect URL here
+            // Check the user role
+            if ($user->role === 'user') {
+                return redirect()->route('profile');
+            }
+
+            // Redirect to dashboard for other roles
+            return redirect()->intended('/dashboard');
         }
 
         // If credentials don't match, return error
         return back()->withErrors([
             'failed' => 'The provided credentials do not match our records.',
         ]);
+    }
+
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
+            ],
+        ]);
+
+        $user = User::create([
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'user',
+        ]);
+
+        $user->sendEmailVerificationNotification();
+
+        return redirect()->route('auth.login')->with('success', 'Registration successful. Please verify your email before logging in.');
     }
 
     public function logout(Request $request)
