@@ -12,6 +12,9 @@
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Agu+Display&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -43,7 +46,8 @@
                     </li>
 
                     <li><a href="{{ route('check.status.form') }}"
-                            class="block py-2 pl-3 pr-4 text-green-800 rounded hover:text-green-600 md:p-0 transition-colors">Check Status</a>
+                            class="block py-2 pl-3 pr-4 text-green-800 rounded hover:text-green-600 md:p-0 transition-colors">Check
+                            Status</a>
                     </li>
 
                     @guest

@@ -110,16 +110,25 @@ class PosController extends Controller
 
         $cartItem = CartItem::where('id', $validated['item_id'])
             ->whereHas('cart', function ($query) {
-                $query->where('session_id', session()->getId());
+                // Check either by session_id or user_id if authenticated
+                $query->where('session_id', session()->getId())
+                    ->orWhere(function ($subQuery) {
+                        if (Auth::check()) {
+                            $subQuery->where('user_id', Auth::id());
+                        }
+                    });
             })
             ->first();
 
         if ($cartItem) {
+            $cart = $cartItem->cart;
             $cartItem->delete();
 
-            $cart = $cartItem->cart;
             if ($cart->cartItems()->count() === 0) {
                 $cart->delete();
+            } else {
+                // Update cart total after removing item
+                $cart->updateTotalAmount();
             }
 
             return back()->with('success', 'Item removed from cart');

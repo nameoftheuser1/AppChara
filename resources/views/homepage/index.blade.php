@@ -5,12 +5,12 @@
             <div class="relative h-56 overflow-hidden rounded-lg md:h-96">
                 <!-- Item 1 -->
                 <div class="hidden duration-3000 ease-in-out" data-carousel-item>
-                    <img src="{{ asset('img/calaca.webp') }}"
+                    <img src="{{ asset('img/background-1.jpg') }}"
                         class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Lomi">
                     <div
                         class="absolute inset-0 bg-gradient-to-r from-green-900/70 to-yellow-900/70 flex items-center justify-center">
                         <div class="text-center text-white">
-                            <h2 class="text-4xl font-bold mb-4">Conchings's Atchara and Delicacies</h2>
+                            <h2 class="text-[5rem] font-bold mb-4 font-agu">Conchings's Atchara and Delicacies</h2>
                             <p class="text-xl">Add a Zing to Every Meal with Our Freshly Made Atchara!</p>
                         </div>
                     </div>

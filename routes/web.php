@@ -53,6 +53,9 @@ Route::middleware(['auth', 'verified', 'role:user'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'indexProfile'])->name('profile');
     Route::get('/reservation-form', [ReservationController::class, 'reservationForm'])->name('reservation-form.form');
     Route::post('/reservation-form/store', [ReservationController::class, 'reservationStore'])->name('reservation-form.store');
+
+    Route::post('/change-password', [AuthController::class, 'changePassword'])->name('change.user-password');
+    Route::post('/delete-account', [AuthController::class, 'deleteAccount'])->name('account.user-delete');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

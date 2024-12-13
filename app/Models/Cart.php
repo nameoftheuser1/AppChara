@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['user_id', 'total_amount', 'session_id'];
 
     public function items()
@@ -21,7 +24,7 @@ class Cart extends Model
     // Method to update the total amount of the cart
     public function updateTotalAmount()
     {
-        $totalAmount = $this->items->sum(function ($item) {
+        $totalAmount = $this->cartItems->sum(function ($item) {
             return $item->price * $item->quantity;
         });
 

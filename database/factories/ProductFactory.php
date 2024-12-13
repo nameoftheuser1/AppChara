@@ -4,9 +4,6 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
- */
 class ProductFactory extends Factory
 {
     /**
@@ -17,7 +14,9 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->word, // Generates a random word for the product name
+            'price' => $this->faker->randomFloat(2, 10, 100), // Random price between 10 and 100
+            'img_path' => $this->faker->imageUrl(640, 480, 'products', true), // Random image URL
         ];
     }
 }

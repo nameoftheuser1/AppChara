@@ -20,7 +20,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('register') }}" method="POST">
+                    <form action="{{ route('register') }}" method="POST" onsubmit="showLoadingOverlay()">
                         @csrf
                         <div class="mb-4">
                             <label for="username" class="block text-gray-700 font-bold text-xl mb-2">Username</label>
@@ -45,8 +45,7 @@
                         <div class="mb-4">
                             <label for="password" class="block text-gray-700 font-bold text-xl mb-2">Password</label>
                             <p class="text-sm text-gray-500 mt-1 p-2 ring-1 m-2 rounded-lg ring-yellow-300">
-                                At least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special
-                                character.
+                                At least 8 characters, 1 uppercase letter, 1 lowercase letter, and 1 number.
                             </p>
                             <input type="password" name="password" id="password"
                                 class="w-full border border-gray-300 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('password') border-red-500 @enderror"
@@ -78,4 +77,6 @@
             </div>
         </div>
     </div>
+
+    @include('partials.loading-script')
 </x-layout>

@@ -8,15 +8,6 @@
                         <img src="{{ asset('img/appchara-logo.png') }}" alt="Logo" class="max-h-20">
                     </div>
 
-                    @if ($errors->any())
-                        <div class="bg-red-500 text-white text-sm p-2 rounded mb-4">
-                            @foreach ($errors->all() as $error)
-                                <p>{{ $error }}</p>
-                            @endforeach
-                        </div>
-                    @endif
-
-
                     @if (session('success'))
                         <div class="bg-green-500 text-white text-sm p-2 rounded mb-4">
                             {{ session('success') }}
@@ -27,7 +18,7 @@
                         @csrf
                         <div class="mb-4">
                             <label for="email" class="block text-gray-700 font-bold text-xl mb-2">Email</label>
-                            <input type="text" name="email" id="email"
+                            <input type="text" name="email" id="email" value="{{ old('email') }}"
                                 class="w-full border border-gray-300 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('email') border-red-500 @enderror"
                                 required>
                             @error('email')
