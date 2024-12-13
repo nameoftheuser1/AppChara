@@ -116,17 +116,16 @@
                                         d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                                 </svg>
                             </button>
-                            <!-- Button to open modal -->
-                            {{-- <button onclick="document.getElementById('changePasswordModal').classList.remove('hidden')"
-                                class="bg-white border border-green-200 rounded-lg p-4 hover:bg-green-100 transition-colors flex items-center justify-between w-full">
-                                <span class="text-green-800">Change Password</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                                </svg>
-                            </button> --}}
                         </form>
+                        <button onclick="document.getElementById('changePasswordModal').classList.remove('hidden')"
+                            class="bg-white border border-green-200 rounded-lg p-4 hover:bg-green-100 transition-colors flex items-center justify-between w-full">
+                            <span class="text-green-800">Change Password</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
