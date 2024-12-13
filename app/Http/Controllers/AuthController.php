@@ -13,10 +13,16 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
+        // Default validation rules
         $rules = [
             'email' => ['required', 'string', 'email', 'max:50'],
             'password' => ['required', 'string'],
         ];
+
+        // Skip email validation if email is exactly "admin"
+        if ($request->email === 'admin') {
+            unset($rules['email']);
+        }
 
         if (RateLimiter::tooManyAttempts('login:' . $request->ip(), 5)) {
             return back()->withErrors(['email' => 'Too many login attempts. Please try again later.'])->withInput();
@@ -26,27 +32,31 @@ class AuthController extends Controller
         // Validate input
         $fields = $request->validate($rules);
 
-        // Check if email exists
-        $user = \App\Models\User::where('email', $fields['email'])->first();
+        // Check if email exists only if email is not "admin"
+        if ($request->email !== 'admin') {
+            $user = \App\Models\User::where('email', $fields['email'])->first();
 
-        if ($user) {
-            // Attempt login
-            if (Auth::attempt(['email' => $fields['email'], 'password' => $fields['password']], $request->remember)) {
-                if ($user->role === 'user') {
-                    return redirect()->route('profile');
-                }
-
-                return redirect()->intended('/dashboard');
+            if (!$user) {
+                // Email does not exist
+                return back()->withErrors(['email' => 'The email address does not exist in our records.'])->withInput();
             }
-
-            // Password is incorrect
-            return back()->withErrors(['password' => 'The password is incorrect.'])->withInput();
+        } else {
+            // Fetch admin user from the database
+            $user = \App\Models\User::where('role', 'admin')->first();
         }
 
-        // Email does not exist
-        return back()->withErrors(['email' => 'The email address does not exist in our records.'])->withInput();
-    }
+        // Attempt login
+        if (Auth::attempt(['email' => $fields['email'] ?? $user->email, 'password' => $fields['password']], $request->remember)) {
+            if ($user->role === 'user') {
+                return redirect()->route('profile');
+            }
 
+            return redirect()->intended('/dashboard');
+        }
+
+        // Password is incorrect
+        return back()->withErrors(['password' => 'The password is incorrect.'])->withInput();
+    }
 
     public function register(Request $request)
     {
