@@ -40,8 +40,7 @@
                             class="w-full bg-gradient-to-r from-yellow-500 to-green-500 text-white font-bold py-2 px-4 rounded-full hover:from-yellow-600 hover:to-green-600 transition duration-300">
                             Login
                         </button>
-                        <a href="{{ route('auth.register') }}" class="text-blue-500 hover:text-blue-700">Do you need an
-                            account?</a>
+                        <a href="{{ route('auth.register') }}" class="text-blue-500 hover:text-blue-700 text-center">Create an account here</a>
                     </form>
                 </div>
             </div>

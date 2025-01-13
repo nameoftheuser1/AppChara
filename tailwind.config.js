@@ -13,7 +13,11 @@ export default {
         extend: {
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
-                agu: ["Agu Display", "sans-serif"],
+                agu: ["'Agu Display'", "sans-serif"],
+                alegreya: ["'Alegreya'", "serif"],
+                permanentmarker: ["'Permanent Marker'", "cursive"],
+                alice: ["'Alice'", "serif"],
+                sacramento: ["'Sacramento'", "serif"]
             },
             animation: {
                 spin: "spin 1s linear infinite", // Define the animation

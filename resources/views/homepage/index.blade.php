@@ -10,8 +10,12 @@
                     <div
                         class="absolute inset-0 bg-gradient-to-r from-green-900/70 to-yellow-900/70 flex items-center justify-center">
                         <div class="text-center text-white">
-                            <h2 class="text-[5rem] font-bold mb-4 font-agu">Conchings's Atchara and Delicacies</h2>
-                            <p class="text-xl">Add a Zing to Every Meal with Our Freshly Made Atchara!</p>
+                            <h2 class="text-5xl sm:text-4xl md:text-5xl lg:text-[5rem] font-bold mb-4 font-sacramento">
+                                Conching's Atchara and Delicacies
+                            </h2>
+                            <p class="text-lg sm:text-base md:text-lg lg:text-xl font-alice">
+                                Add a Zing to Every Meal with Our Freshly Made Atchara!
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -59,7 +63,7 @@
 
     <!-- Specialties Section -->
     <section id="specialties" class="py-16 px-4 max-w-screen-xl mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-12 text-green-800">Our Specialties</h2>
+        <h2 class="text-4xl font-bold text-center mb-12 text-green-800 font-sacramento">Our Specialties</h2>
         <div class="grid md:grid-cols-3 gap-8">
             <!-- Food Items with updated styling -->
             <div
@@ -67,7 +71,7 @@
                 <img src="{{ asset('img/papaya-default.jpg') }}" alt="Lomi" class="w-full h-48 object-cover">
                 <div class="p-6">
                     <h3 class="text-xl font-bold mb-2 text-green-800">Papaya</h3>
-                    <p class="text-green-700">Papaya atchara is a Filipino-style pickled green papaya. It pairs
+                    <p class="text-green-700 ">Papaya atchara is a Filipino-style pickled green papaya. It pairs
                         perfectly with grilled and fried dishes, enhancing the overall dining experience.</p>
                 </div>
             </div>
@@ -98,8 +102,9 @@
         <div class="max-w-screen-xl mx-auto px-4">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h2 class="text-3xl font-bold mb-6 text-green-800">About Casiana Camson Villamar</h2>
-                    <p class="text-green-700 mb-4">
+                    <h2 class="text-4xl font-bold mb-6 text-green-800  font-sacramento">About Casiana Camson Villamar
+                    </h2>
+                    <p class="text-green-700 mb-4 font-alice">
                         Casiana Camson Villamar, born in 1936, was the founder of Conching's Atchara and Delicacies. She
                         began her entrepreneurial journey at the age of 31, initially establishing the business in
                         Poblacion 2. Later, it was relocated to Poblacion 5, where it continued to grow and serve the
