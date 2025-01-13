@@ -47,10 +47,22 @@
                             <p class="text-sm text-gray-500 mt-1 p-2 ring-1 m-2 rounded-lg ring-yellow-300">
                                 At least 8 characters, 1 uppercase letter, 1 lowercase letter, and 1 number.
                             </p>
-                            <input type="password" name="password" id="password"
-                                class="w-full border border-gray-300 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('password') border-red-500 @enderror"
-                                required>
-
+                            <div class="relative">
+                                <input type="password" name="password" id="password"
+                                    class="w-full border border-gray-300 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('password') border-red-500 @enderror"
+                                    required>
+                                <button type="button" class="absolute right-3 top-2 text-gray-500"
+                                    onclick="togglePassword('password')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path class="eye-open" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path class="eye-open" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
                             @error('password')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                             @enderror
@@ -59,9 +71,22 @@
                         <div class="mb-6">
                             <label for="password_confirmation"
                                 class="block text-gray-700 font-bold text-xl mb-2">Confirm Password</label>
-                            <input type="password" name="password_confirmation" id="password_confirmation"
-                                class="w-full border border-gray-300 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required>
+                            <div class="relative">
+                                <input type="password" name="password_confirmation" id="password_confirmation"
+                                    class="w-full border border-gray-300 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required>
+                                <button type="button" class="absolute right-3 top-2 text-gray-500"
+                                    onclick="togglePassword('password_confirmation')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path class="eye-open" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path class="eye-open" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
 
                         <button type="submit"
@@ -78,5 +103,11 @@
         </div>
     </div>
 
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
     @include('partials.loading-script')
 </x-layout>
